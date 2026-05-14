@@ -1,7 +1,6 @@
 import React, { useRef, useState } from 'react';
-import { Moon, Sun, Download, Upload, Bell } from 'lucide-react';
+import { Moon, Sun, Download, Upload } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
-import { useAlerts } from '../../hooks/useAlerts';
 import { useAppStore } from '../../store/useAppStore';
 import { BackupService } from '../../../infrastructure/persistence/BackupService';
 import { Button } from '../common/Button';
@@ -14,7 +13,6 @@ interface HeaderProps {
 
 export const Header: React.FC<HeaderProps> = ({ title }) => {
   const { isDark, toggleTheme } = useTheme();
-  const { totalCount } = useAlerts();
   const { sprints, stories, progressRecords, developers, holidays, availability, restoreData } = useAppStore();
   const fileInputRef = useRef<HTMLInputElement>(null);
   const [pendingFile, setPendingFile] = useState<File | null>(null);
@@ -70,16 +68,6 @@ export const Header: React.FC<HeaderProps> = ({ title }) => {
         <h1 className="text-xl font-semibold text-gray-900 dark:text-white">{title}</h1>
 
         <div className="flex items-center gap-2">
-          {/* Alert indicator */}
-          {totalCount > 0 && (
-            <div className="relative flex items-center">
-              <Bell className="h-5 w-5 text-amber-500" />
-              <span className="absolute -top-1 -right-1 h-3.5 w-3.5 bg-red-500 rounded-full text-white text-[9px] flex items-center justify-center font-bold">
-                {totalCount > 9 ? '9+' : totalCount}
-              </span>
-            </div>
-          )}
-
           {/* Backup buttons */}
           <Button variant="outline" size="sm" onClick={handleExport} leftIcon={<Download className="h-4 w-4" />}>
             Exportar

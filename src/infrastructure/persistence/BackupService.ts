@@ -23,7 +23,9 @@ export class BackupService {
     const url = URL.createObjectURL(blob);
     const link = document.createElement('a');
     link.href = url;
-    link.download = `scrum-tracker-backup-${new Date().toISOString().split('T')[0]}.json`;
+    const now = new Date();
+    const localDate = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}-${String(now.getDate()).padStart(2, '0')}`;
+    link.download = `scrum-tracker-backup-${localDate}.json`;
     document.body.appendChild(link);
     link.click();
     document.body.removeChild(link);

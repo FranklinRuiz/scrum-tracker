@@ -88,7 +88,7 @@ export const TimelinePage: React.FC = () => {
     ? progressRecords.filter((p) => p.storyId === selectedStory.id)
     : [];
 
-  // Bar position: from story created/sprint start to commitment date, in weekday columns
+  // Bar position: from story created/sprint start to commitment date (or met date if commitmentMet)
   const getStoryBarStyle = (story: UserStory) => {
     if (!selectedSprint || timelineDays.length === 0) return { left: '0%', width: '100%' };
     const total = timelineDays.length;
@@ -96,11 +96,16 @@ export const TimelinePage: React.FC = () => {
     const sprintEndStr = selectedSprint.endDate;
     const createdStr = ds(parseISO(story.createdAt));
     const storyStartStr = createdStr > sprintStartStr ? createdStr : sprintStartStr;
-    const storyEndStr = story.commitmentDate
-      ? ds(parseISO(story.commitmentDate)) <= sprintEndStr
-        ? ds(parseISO(story.commitmentDate))
-        : sprintEndStr
-      : sprintEndStr;
+
+    // If commitment was met, bar ends at the date it was actually met
+    const metRecord = progressRecords
+      .filter((p) => p.storyId === story.id && p.commitmentMet)
+      .sort((a, b) => a.timestamp.localeCompare(b.timestamp))[0];
+    const metDateStr = metRecord ? ds(parseISO(metRecord.timestamp)) : null;
+
+    const rawEndStr = metDateStr
+      ?? (story.commitmentDate ? ds(parseISO(story.commitmentDate)) : sprintEndStr);
+    const storyEndStr = rawEndStr <= sprintEndStr ? rawEndStr : sprintEndStr;
 
     const startIdx = weekdaysBefore(storyStartStr);
     const span = Math.max(1, weekdaysInRange(storyStartStr, storyEndStr));
