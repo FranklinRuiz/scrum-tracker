@@ -37,8 +37,8 @@ export const Sidebar: React.FC = () => {
   return (
     <aside className="h-full flex flex-col bg-white dark:bg-slate-900 border-r border-gray-200 dark:border-slate-700 w-64 shrink-0">
       {/* Logo */}
-      <div className="flex items-center gap-3 px-6 py-5 border-b border-gray-200 dark:border-slate-700">
-        <div className="h-8 w-8 bg-indigo-600 rounded-lg flex items-center justify-center">
+      <div className="flex items-center gap-3 px-6 py-3.5 border-b border-gray-200 dark:border-slate-700">
+        <div className="h-8 w-8 bg-indigo-600 rounded-lg flex items-center justify-center shrink-0">
           <Zap className="h-5 w-5 text-white" />
         </div>
         <div>
