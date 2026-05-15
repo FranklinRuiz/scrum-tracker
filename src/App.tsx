@@ -1,5 +1,5 @@
 import { useEffect } from 'react';
-import { BrowserRouter, Routes, Route } from 'react-router-dom';
+import { HashRouter, Routes, Route } from 'react-router-dom';
 import { Toaster } from 'react-hot-toast';
 import { Layout } from './presentation/components/layout/Layout';
 import { DashboardPage } from './presentation/pages/DashboardPage';
@@ -62,7 +62,7 @@ function AppContent() {
 
 function App() {
   return (
-    <BrowserRouter basename={import.meta.env.BASE_URL.replace(/\/$/, '')}>
+    <HashRouter>
       <AppContent />
       <Toaster
         position="bottom-right"
@@ -86,7 +86,7 @@ function App() {
           },
         }}
       />
-    </BrowserRouter>
+    </HashRouter>
   );
 }
 
