@@ -10,6 +10,8 @@ import { ProgressBar } from '../common/ProgressBar';
 import { Badge } from '../common/Badge';
 import { STORY_STATUS_COLORS, STORY_STATUS_LABELS } from '../../../domain/value-objects/StoryStatus';
 
+const HOURS_PER_POINT = 8;
+
 interface SprintProgressProps {
   sprint: Sprint;
   stories: UserStory[];
@@ -17,16 +19,21 @@ interface SprintProgressProps {
 }
 
 export const SprintProgress: React.FC<SprintProgressProps> = ({ sprint, stories, progressRecords }) => {
+  // Progress bar: hours worked vs total capacity
+  const storyIds = new Set(stories.map((s) => s.id));
+  const totalHours = progressRecords
+    .filter((p) => storyIds.has(p.storyId))
+    .reduce((sum, p) => sum + p.hoursWorked, 0);
+  const totalCapacity = stories.reduce((sum, s) => sum + s.points * HOURS_PER_POINT, 0);
+  const progress = totalCapacity > 0 ? Math.round((totalHours / totalCapacity) * 100) : 0;
+
+  // Completed points stat (stories fully done or commitmentMet)
   const storyIdsWithCommitmentMet = new Set(
     progressRecords.filter((p) => p.commitmentMet).map((p) => p.storyId)
   );
   const completedPoints = stories
     .filter((s) => isTerminalStatus(s.status) || storyIdsWithCommitmentMet.has(s.id))
     .reduce((sum, s) => sum + s.points, 0);
-  const progress =
-    sprint.committedPoints > 0
-      ? Math.round((completedPoints / sprint.committedPoints) * 100)
-      : 0;
 
   const statusCounts = stories.reduce<Record<string, number>>((acc, s) => {
     acc[s.status] = (acc[s.status] ?? 0) + 1;
@@ -61,7 +68,7 @@ export const SprintProgress: React.FC<SprintProgressProps> = ({ sprint, stories,
           <span className="text-sm font-medium text-gray-700 dark:text-gray-300">Progreso del sprint</span>
           <div className="flex items-center gap-2">
             <span className="text-sm text-gray-500 dark:text-gray-400">
-              {completedPoints} / {sprint.committedPoints} pts
+              {(totalHours / HOURS_PER_POINT).toFixed(1)} / {sprint.committedPoints} pts
             </span>
             <span className="text-sm font-bold text-gray-900 dark:text-white">{progress}%</span>
           </div>

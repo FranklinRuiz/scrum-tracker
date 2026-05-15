@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { format, parseISO } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { X, AlertTriangle, Calendar, User, Zap, ExternalLink } from 'lucide-react';
+import { X, AlertTriangle, Calendar, User, Zap, ExternalLink, TrendingUp } from 'lucide-react';
 import { clsx } from 'clsx';
 import type { UserStory } from '../../../domain/entities/UserStory';
 import type { Developer } from '../../../domain/entities/Developer';
@@ -27,10 +27,18 @@ interface StoryDetailSimpleProps {
     developerId: string;
     hoursWorked: number;
     comment: string;
-    progressPercentage: number;
     newStatus: UserStory['status'];
     commitmentMet: boolean;
   }) => Promise<void>;
+  onEditProgress?: (recordId: string, data: {
+    storyId: string;
+    developerId: string;
+    hoursWorked: number;
+    comment: string;
+    newStatus: UserStory['status'];
+    commitmentMet: boolean;
+  }) => Promise<void>;
+  onDeleteProgress?: (recordId: string, storyId: string) => Promise<void>;
   onEdit: () => void;
   onStatusChange?: (storyId: string, newStatus: StoryStatus) => Promise<void>;
 }
@@ -41,10 +49,13 @@ export const StoryDetail: React.FC<StoryDetailSimpleProps> = ({
   progressRecords,
   onClose,
   onAddProgress,
+  onEditProgress,
+  onDeleteProgress,
   onEdit,
   onStatusChange,
 }) => {
   const [showProgressForm, setShowProgressForm] = useState(false);
+  const [editingRecord, setEditingRecord] = useState<ProgressRecord | null>(null);
   const [isChangingStatus, setIsChangingStatus] = useState(false);
   const assignedDevs = developers.filter((d) => story.assignees.includes(d.id));
   const storyProgress = progressRecords
@@ -155,9 +166,24 @@ export const StoryDetail: React.FC<StoryDetailSimpleProps> = ({
             <div>
               <div className="flex items-center justify-between mb-2">
                 <h3 className="text-sm font-semibold text-gray-700 dark:text-gray-300">Avance</h3>
-                <span className="text-sm font-bold text-gray-900 dark:text-white">{story.progress}%</span>
+                <span className={clsx(
+                  'text-sm font-bold',
+                  story.progress > 100
+                    ? 'text-amber-600 dark:text-amber-400'
+                    : 'text-gray-900 dark:text-white'
+                )}>
+                  {story.progress}%
+                </span>
               </div>
               <ProgressBar value={story.progress} size="lg" />
+              {story.progress > 100 && (
+                <div className="flex items-center gap-1.5 mt-2 text-xs text-amber-600 dark:text-amber-400">
+                  <TrendingUp className="h-3.5 w-3.5 shrink-0" />
+                  <span>
+                    Se invirtieron <span className="font-semibold">{story.progress - 100}% más</span> de lo estimado ({story.points} pts = {story.points * 8}h)
+                  </span>
+                </div>
+              )}
             </div>
 
             {/* Metadatos */}
@@ -167,6 +193,15 @@ export const StoryDetail: React.FC<StoryDetailSimpleProps> = ({
                 <span className="text-gray-500 dark:text-gray-400">Puntos:</span>
                 <span className="font-semibold text-gray-900 dark:text-white">{story.points}</span>
               </div>
+              {story.startDate && (
+                <div className="flex items-center gap-2 text-sm">
+                  <Calendar className="h-4 w-4 text-green-500" />
+                  <span className="text-gray-500 dark:text-gray-400">Inicio:</span>
+                  <span className="font-semibold text-gray-900 dark:text-white">
+                    {format(parseISO(story.startDate), "d 'de' MMM yyyy", { locale: es })}
+                  </span>
+                </div>
+              )}
               <div className={clsx('flex items-center gap-2 text-sm', isOverdue ? 'text-red-600 dark:text-red-400' : '')}>
                 <Calendar className="h-4 w-4" />
                 <span className={clsx(isOverdue ? '' : 'text-gray-500 dark:text-gray-400')}>Compromiso:</span>
@@ -208,6 +243,8 @@ export const StoryDetail: React.FC<StoryDetailSimpleProps> = ({
               <ProgressTimeline
                 records={storyProgress}
                 developers={developers}
+                onEdit={onEditProgress ? (record) => setEditingRecord(record) : undefined}
+                onDelete={onDeleteProgress ? (recordId) => onDeleteProgress(recordId, story.id) : undefined}
               />
             </div>
           </div>
@@ -223,6 +260,23 @@ export const StoryDetail: React.FC<StoryDetailSimpleProps> = ({
           onSubmit={async (data) => {
             await onAddProgress(data);
             setShowProgressForm(false);
+          }}
+        />
+      )}
+
+      {editingRecord && onEditProgress && (
+        <ProgressForm
+          isOpen
+          onClose={() => setEditingRecord(null)}
+          story={story}
+          developers={developers}
+          editRecord={editingRecord}
+          otherRecordsHours={storyProgress
+            .filter((r) => r.id !== editingRecord.id)
+            .reduce((sum, r) => sum + r.hoursWorked, 0)}
+          onSubmit={async (data) => {
+            await onEditProgress(editingRecord.id, data);
+            setEditingRecord(null);
           }}
         />
       )}

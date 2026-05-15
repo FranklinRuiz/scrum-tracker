@@ -5,6 +5,7 @@ import { Button } from '../common/Button';
 import { Select } from '../common/Select';
 import type { UserStory } from '../../../domain/entities/UserStory';
 import type { Developer } from '../../../domain/entities/Developer';
+import type { ProgressRecord } from '../../../domain/entities/ProgressRecord';
 import type { StoryStatus } from '../../../domain/value-objects/StoryStatus';
 import { STORY_STATUS_ORDER, STORY_STATUS_LABELS } from '../../../domain/value-objects/StoryStatus';
 
@@ -13,12 +14,15 @@ interface ProgressFormProps {
   onClose: () => void;
   story: UserStory;
   developers: Developer[];
+  /** Cuando se pasa, el form actúa en modo edición */
+  editRecord?: ProgressRecord;
+  /** Suma de horas de todos los registros excepto el que se está editando */
+  otherRecordsHours?: number;
   onSubmit: (data: {
     storyId: string;
     developerId: string;
     hoursWorked: number;
     comment: string;
-    progressPercentage: number;
     newStatus: StoryStatus;
     commitmentMet: boolean;
   }) => Promise<void>;
@@ -30,24 +34,35 @@ export const ProgressForm: React.FC<ProgressFormProps> = ({
   onClose,
   story,
   developers,
+  editRecord,
+  otherRecordsHours = 0,
   onSubmit,
   isLoading = false,
 }) => {
-  const [developerId, setDeveloperId] = useState(story.assignees[0] ?? developers[0]?.id ?? '');
-  const [hoursWorked, setHoursWorked] = useState('1');
-  const [comment, setComment] = useState('');
-  const [progressPercentage, setProgressPercentage] = useState(story.progress.toString());
-  const [newStatus, setNewStatus] = useState<StoryStatus>(story.status);
-  const [commitmentMet, setCommitmentMet] = useState(false);
+  const isEditMode = !!editRecord;
+  const [developerId, setDeveloperId] = useState(
+    editRecord?.developerId ?? story.assignees[0] ?? developers[0]?.id ?? ''
+  );
+  const [hoursWorked, setHoursWorked] = useState(
+    editRecord ? editRecord.hoursWorked.toString() : '1'
+  );
+  const [comment, setComment] = useState(editRecord?.comment ?? '');
+  const [newStatus, setNewStatus] = useState<StoryStatus>(editRecord?.newStatus ?? story.status);
+  const [commitmentMet, setCommitmentMet] = useState(editRecord?.commitmentMet ?? false);
   const [errors, setErrors] = useState<Record<string, string>>({});
+
+  const hoursPerPoint = 8;
+  const previewHours = parseFloat(hoursWorked) || 0;
+  const baseHours = isEditMode ? otherRecordsHours : story.progress * (story.points * hoursPerPoint) / 100;
+  const projectedProgress = story.points > 0
+    ? Math.round(((baseHours + previewHours) / (story.points * hoursPerPoint)) * 100)
+    : 0;
 
   const validate = (): boolean => {
     const errs: Record<string, string> = {};
     if (!developerId) errs.developerId = 'Developer is required';
     const hrs = parseFloat(hoursWorked);
     if (isNaN(hrs) || hrs < 0) errs.hoursWorked = 'Must be a non-negative number';
-    const prog = parseInt(progressPercentage, 10);
-    if (isNaN(prog) || prog < 0 || prog > 100) errs.progressPercentage = 'Must be between 0 and 100';
     if (!comment.trim()) errs.comment = 'Comment is required';
     setErrors(errs);
     return Object.keys(errs).length === 0;
@@ -61,7 +76,6 @@ export const ProgressForm: React.FC<ProgressFormProps> = ({
       developerId,
       hoursWorked: parseFloat(hoursWorked),
       comment: comment.trim(),
-      progressPercentage: parseInt(progressPercentage, 10),
       newStatus,
       commitmentMet,
     });
@@ -76,13 +90,13 @@ export const ProgressForm: React.FC<ProgressFormProps> = ({
     <Modal
       isOpen={isOpen}
       onClose={onClose}
-      title="Registrar avance"
+      title={isEditMode ? 'Editar avance' : 'Registrar avance'}
       size="md"
       footer={
         <>
           <Button variant="outline" onClick={onClose} disabled={isLoading}>Cancelar</Button>
           <Button variant="primary" isLoading={isLoading} onClick={handleSubmit}>
-            Guardar avance
+            {isEditMode ? 'Guardar cambios' : 'Guardar avance'}
           </Button>
         </>
       }
@@ -90,7 +104,7 @@ export const ProgressForm: React.FC<ProgressFormProps> = ({
       <div className="mb-4 p-3 bg-gray-50 dark:bg-slate-700 rounded-lg">
         <p className="text-sm font-medium text-gray-700 dark:text-gray-300 truncate">{story.title}</p>
         <p className="text-xs text-gray-500 dark:text-gray-400 mt-0.5">
-          Avance actual: {story.progress}% — Estado: {STORY_STATUS_LABELS[story.status]}
+          Avance actual: {story.progress}% — {story.points} pts ({story.points * hoursPerPoint}h capacidad) — Estado: {STORY_STATUS_LABELS[story.status]}
         </p>
       </div>
 
@@ -106,31 +120,27 @@ export const ProgressForm: React.FC<ProgressFormProps> = ({
           {errors.developerId && <p className={errorClass}>{errors.developerId}</p>}
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label className={labelClass}>Horas trabajadas</label>
-            <input
-              type="number"
-              min="0"
-              step="0.5"
-              className={inputClass}
-              value={hoursWorked}
-              onChange={(e) => setHoursWorked(e.target.value)}
-            />
-            {errors.hoursWorked && <p className={errorClass}>{errors.hoursWorked}</p>}
-          </div>
-          <div>
-            <label className={labelClass}>Avance (%)</label>
-            <input
-              type="number"
-              min="0"
-              max="100"
-              className={inputClass}
-              value={progressPercentage}
-              onChange={(e) => setProgressPercentage(e.target.value)}
-            />
-            {errors.progressPercentage && <p className={errorClass}>{errors.progressPercentage}</p>}
-          </div>
+        <div>
+          <label className={labelClass}>Horas trabajadas</label>
+          <input
+            type="number"
+            min="0"
+            step="0.5"
+            className={inputClass}
+            value={hoursWorked}
+            onChange={(e) => setHoursWorked(e.target.value)}
+          />
+          {errors.hoursWorked && <p className={errorClass}>{errors.hoursWorked}</p>}
+          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+            Avance proyectado:{' '}
+            <span className={`font-medium ${projectedProgress > 100 ? 'text-amber-600 dark:text-amber-400' : 'text-indigo-600 dark:text-indigo-400'}`}>
+              {projectedProgress}%
+            </span>
+            {projectedProgress > 100 && (
+              <span className="ml-1 text-amber-500 dark:text-amber-400">(supera el estimado)</span>
+            )}
+            {' '}(1 punto = {hoursPerPoint}h)
+          </p>
         </div>
 
         <div>

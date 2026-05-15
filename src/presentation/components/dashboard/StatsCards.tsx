@@ -1,5 +1,5 @@
 import React from 'react';
-import { Target, AlertTriangle, TrendingUp, Zap } from 'lucide-react';
+import { AlertTriangle, TrendingUp, Zap } from 'lucide-react';
 import { clsx } from 'clsx';
 
 interface StatCardProps {
@@ -59,31 +59,18 @@ const StatCard: React.FC<StatCardProps> = ({ title, value, subtitle, icon, color
 };
 
 interface StatsCardsProps {
-  sprintProgress: number;
   blockedCount: number;
   atRiskCount: number;
   teamVelocity: number;
-  committedPoints: number;
-  completedPoints: number;
 }
 
 export const StatsCards: React.FC<StatsCardsProps> = ({
-  sprintProgress,
   blockedCount,
   atRiskCount,
   teamVelocity,
-  committedPoints,
-  completedPoints,
 }) => {
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-4 gap-4">
-      <StatCard
-        title="Progreso del Sprint"
-        value={`${sprintProgress}%`}
-        subtitle={`${completedPoints} / ${committedPoints} puntos`}
-        icon={<Target className="h-5 w-5" />}
-        color="indigo"
-      />
+    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4">
       <StatCard
         title="Historias bloqueadas"
         value={blockedCount}

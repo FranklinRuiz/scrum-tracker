@@ -6,5 +6,6 @@ export interface IProgressRepository {
   getByStoryId(storyId: string): Promise<ProgressRecord[]>;
   getByDeveloperId(developerId: string): Promise<ProgressRecord[]>;
   save(record: ProgressRecord): Promise<void>;
+  update(record: ProgressRecord): Promise<void>;
   delete(id: string): Promise<void>;
 }

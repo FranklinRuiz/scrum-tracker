@@ -24,9 +24,12 @@ export const TimelinePage: React.FC = () => {
     selectedSprintId,
     setSelectedSprint,
     addProgress,
+    editProgress,
+    deleteProgress,
   } = useAppStore();
 
-  const [selectedStory, setSelectedStory] = useState<UserStory | null>(null);
+  const [selectedStoryId, setSelectedStoryId] = useState<string | null>(null);
+  const selectedStory = selectedStoryId ? (stories.find((s) => s.id === selectedStoryId) ?? null) : null;
 
   const selectedSprint = useMemo(
     () => sprints.find((s) => s.id === selectedSprintId) ?? null,
@@ -70,17 +73,33 @@ export const TimelinePage: React.FC = () => {
     developerId: string;
     hoursWorked: number;
     comment: string;
-    progressPercentage: number;
     newStatus: StoryStatus;
     commitmentMet: boolean;
   }) => {
     try {
       await addProgress(data);
       toast.success('Avance registrado');
-      const updated = stories.find((s) => s.id === data.storyId);
-      if (updated) setSelectedStory(updated);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Error al registrar avance');
+    }
+  };
+
+  const handleEditProgress = async (recordId: string, data: {
+    storyId: string; developerId: string; hoursWorked: number;
+    comment: string; newStatus: StoryStatus; commitmentMet: boolean;
+  }) => {
+    try {
+      await editProgress({ recordId, ...data });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al editar avance');
+    }
+  };
+
+  const handleDeleteProgress = async (recordId: string, storyId: string) => {
+    try {
+      await deleteProgress(recordId, storyId);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al eliminar avance');
     }
   };
 
@@ -88,23 +107,32 @@ export const TimelinePage: React.FC = () => {
     ? progressRecords.filter((p) => p.storyId === selectedStory.id)
     : [];
 
-  // Bar position: from story created/sprint start to commitment date (or met date if commitmentMet)
   const getStoryBarStyle = (story: UserStory) => {
     if (!selectedSprint || timelineDays.length === 0) return { left: '0%', width: '100%' };
     const total = timelineDays.length;
     const sprintStartStr = selectedSprint.startDate;
     const sprintEndStr = selectedSprint.endDate;
-    const createdStr = ds(parseISO(story.createdAt));
-    const storyStartStr = createdStr > sprintStartStr ? createdStr : sprintStartStr;
 
-    // If commitment was met, bar ends at the date it was actually met
+    // Start: startDate > fallback to createdAt, clamped to sprint start
+    const rawStartStr = story.startDate
+      ? ds(parseISO(story.startDate))
+      : ds(parseISO(story.createdAt));
+    const storyStartStr = rawStartStr > sprintStartStr ? rawStartStr : sprintStartStr;
+
+    // If commitment was met, bar ends at the date it was met
     const metRecord = progressRecords
       .filter((p) => p.storyId === story.id && p.commitmentMet)
       .sort((a, b) => a.timestamp.localeCompare(b.timestamp))[0];
     const metDateStr = metRecord ? ds(parseISO(metRecord.timestamp)) : null;
 
-    const rawEndStr = metDateStr
-      ?? (story.commitmentDate ? ds(parseISO(story.commitmentDate)) : sprintEndStr);
+    let rawEndStr: string;
+    if (isTerminalStatus(story.status) || metDateStr) {
+      // Done: end at met date or commitment date
+      rawEndStr = metDateStr ?? (story.commitmentDate ? ds(parseISO(story.commitmentDate)) : sprintEndStr);
+    } else {
+      // In progress: end at today (clamped to sprint end)
+      rawEndStr = todayStr <= sprintEndStr ? todayStr : sprintEndStr;
+    }
     const storyEndStr = rawEndStr <= sprintEndStr ? rawEndStr : sprintEndStr;
 
     const startIdx = weekdaysBefore(storyStartStr);
@@ -306,7 +334,7 @@ export const TimelinePage: React.FC = () => {
                     {/* Story info column */}
                     <div
                       className="w-72 shrink-0 px-4 py-3 border-r border-gray-200 dark:border-slate-700 cursor-pointer"
-                      onClick={() => setSelectedStory(story)}
+                      onClick={() => setSelectedStoryId(story.id)}
                     >
                       <div className="flex items-start gap-2">
                         <div className="flex-1 min-w-0">
@@ -324,10 +352,16 @@ export const TimelinePage: React.FC = () => {
                           <p className="text-sm font-medium text-gray-900 dark:text-white line-clamp-2">
                             {story.title}
                           </p>
-                          <div className="flex items-center gap-2 mt-1">
+                          <div className="flex items-center gap-2 mt-1 flex-wrap">
                             <Badge className={STORY_STATUS_COLORS[story.status]}>
                               {STORY_STATUS_LABELS[story.status]}
                             </Badge>
+                            {story.startDate && (
+                              <span className="text-[10px] text-gray-400 dark:text-gray-500 flex items-center gap-0.5">
+                                <Calendar className="h-3 w-3" />
+                                {format(parseISO(story.startDate), "d 'de' MMM", { locale: es })}
+                              </span>
+                            )}
                           </div>
                         </div>
                       </div>
@@ -388,7 +422,7 @@ export const TimelinePage: React.FC = () => {
                         <div
                           className="absolute z-10 flex items-center gap-2 cursor-pointer"
                           style={getStoryBarStyle(story)}
-                          onClick={() => setSelectedStory(story)}
+                          onClick={() => setSelectedStoryId(story.id)}
                         >
                           <div
                             className={clsx(
@@ -400,7 +434,7 @@ export const TimelinePage: React.FC = () => {
                             <div className="relative flex-1 h-full flex items-center overflow-hidden rounded">
                               <div
                                 className="absolute left-0 top-0 bottom-0 bg-white/20 rounded"
-                                style={{ width: `${story.progress}%` }}
+                                style={{ width: `${Math.min(100, story.progress)}%` }}
                               />
                               <span className="relative text-white text-xs font-semibold truncate px-1">
                                 {story.progress}%
@@ -420,9 +454,11 @@ export const TimelinePage: React.FC = () => {
                                 <Clock className="h-3.5 w-3.5" />
                               )}
                               <span className="text-xs hidden sm:inline">
-                                {story.commitmentDate
-                                  ? format(parseISO(story.commitmentDate), "d 'de' MMM", { locale: es })
-                                  : '—'}
+                                {isTerminalStatus(story.status)
+                                  ? story.commitmentDate
+                                    ? format(parseISO(story.commitmentDate), "d 'de' MMM", { locale: es })
+                                    : '—'
+                                  : 'Hoy'}
                               </span>
                             </div>
                           </div>
@@ -489,9 +525,11 @@ export const TimelinePage: React.FC = () => {
           story={selectedStory}
           developers={developers}
           progressRecords={selectedStoryProgressRecords}
-          onClose={() => setSelectedStory(null)}
+          onClose={() => setSelectedStoryId(null)}
           onAddProgress={handleAddProgress}
-          onEdit={() => setSelectedStory(null)}
+          onEditProgress={handleEditProgress}
+          onDeleteProgress={handleDeleteProgress}
+          onEdit={() => setSelectedStoryId(null)}
         />
       )}
     </div>

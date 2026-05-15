@@ -2,7 +2,7 @@ import React from 'react';
 import { clsx } from 'clsx';
 
 interface ProgressBarProps {
-  value: number; // 0-100
+  value: number; // 0-N, supports > 100 for overflow
   className?: string;
   size?: 'sm' | 'md' | 'lg';
   color?: 'default' | 'green' | 'amber' | 'red' | 'indigo';
@@ -32,12 +32,15 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
   showLabel = false,
   animated = false,
 }) => {
-  const clamped = Math.min(100, Math.max(0, value));
+  const isOverflow = value > 100;
+  const displayValue = Math.max(0, value);
+  const barWidth = Math.min(100, displayValue);
 
   const autoColor = (): typeof color => {
+    if (isOverflow) return 'amber';
     if (color !== 'default') return color;
-    if (clamped >= 70) return 'green';
-    if (clamped >= 40) return 'indigo';
+    if (displayValue >= 70) return 'green';
+    if (displayValue >= 40) return 'indigo';
     return 'amber';
   };
 
@@ -45,22 +48,43 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
     <div className={clsx('flex items-center gap-2', className)}>
       <div
         className={clsx(
-          'flex-1 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden',
-          sizeClasses[size]
+          'flex-1 rounded-full overflow-hidden relative',
+          sizeClasses[size],
+          isOverflow
+            ? 'bg-amber-100 dark:bg-amber-900/30'
+            : 'bg-gray-200 dark:bg-slate-700'
         )}
       >
-        <div
-          className={clsx(
-            'h-full rounded-full transition-all duration-500',
-            colorClasses[autoColor()],
-            animated && 'animate-pulse'
-          )}
-          style={{ width: `${clamped}%` }}
-        />
+        {isOverflow ? (
+          /* Overflow: full bar with diagonal stripe pattern */
+          <div
+            className="h-full w-full rounded-full"
+            style={{
+              background:
+                'repeating-linear-gradient(45deg, #f59e0b, #f59e0b 4px, #fbbf24 4px, #fbbf24 8px)',
+            }}
+          />
+        ) : (
+          <div
+            className={clsx(
+              'h-full rounded-full transition-all duration-500',
+              colorClasses[autoColor()],
+              animated && 'animate-pulse'
+            )}
+            style={{ width: `${barWidth}%` }}
+          />
+        )}
       </div>
       {showLabel && (
-        <span className="text-xs text-gray-500 dark:text-gray-400 w-8 text-right">
-          {clamped}%
+        <span
+          className={clsx(
+            'text-xs w-8 text-right font-medium',
+            isOverflow
+              ? 'text-amber-600 dark:text-amber-400'
+              : 'text-gray-500 dark:text-gray-400'
+          )}
+        >
+          {displayValue}%
         </span>
       )}
     </div>

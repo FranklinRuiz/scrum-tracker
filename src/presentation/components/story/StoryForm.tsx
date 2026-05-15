@@ -44,6 +44,7 @@ export const StoryForm: React.FC<StoryFormProps> = ({
   const [priority, setPriority] = useState<Priority>(initialData?.priority ?? 'medium');
   const [points, setPoints] = useState(initialData?.points?.toString() ?? '');
   const [sprintId, setSprintId] = useState(initialData?.sprintId ?? defaultSprintId ?? '');
+  const [startDate, setStartDate] = useState(initialData?.startDate ?? '');
   const [commitmentDate, setCommitmentDate] = useState(initialData?.commitmentDate ?? '');
   const [assignees, setAssignees] = useState<string[]>(initialData?.assignees ?? []);
   const [status, setStatus] = useState<StoryStatus>(initialData?.status ?? 'open');
@@ -60,6 +61,7 @@ export const StoryForm: React.FC<StoryFormProps> = ({
       setPriority(initialData.priority ?? 'medium');
       setPoints(initialData.points?.toString() ?? '');
       setSprintId(initialData.sprintId ?? defaultSprintId ?? '');
+      setStartDate(initialData.startDate ?? '');
       setCommitmentDate(initialData.commitmentDate ?? '');
       setAssignees(initialData.assignees ?? []);
       setStatus(initialData.status ?? 'open');
@@ -72,6 +74,7 @@ export const StoryForm: React.FC<StoryFormProps> = ({
       setPriority('medium');
       setPoints('');
       setSprintId(defaultSprintId ?? '');
+      setStartDate('');
       setCommitmentDate('');
       setAssignees([]);
       setStatus('open');
@@ -111,6 +114,7 @@ export const StoryForm: React.FC<StoryFormProps> = ({
       priority,
       points: parseInt(points, 10),
       sprintId,
+      startDate: startDate || undefined,
       commitmentDate,
       assignees,
       status,
@@ -159,7 +163,7 @@ export const StoryForm: React.FC<StoryFormProps> = ({
           />
         </div>
 
-        <div className="grid grid-cols-2 gap-4">
+        <div className="grid grid-cols-3 gap-4">
           <div>
             <label className={labelClass}>Sprint *</label>
             <Select value={sprintId} onChange={(e) => setSprintId(e.target.value)}>
@@ -169,6 +173,10 @@ export const StoryForm: React.FC<StoryFormProps> = ({
               ))}
             </Select>
             {errors.sprintId && <p className={errorClass}>{errors.sprintId}</p>}
+          </div>
+          <div>
+            <label className={labelClass}>Fecha inicio</label>
+            <input type="date" className={inputClass} value={startDate} onChange={(e) => setStartDate(e.target.value)} />
           </div>
           <div>
             <label className={labelClass}>Fecha compromiso *</label>

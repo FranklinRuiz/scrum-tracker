@@ -30,6 +30,14 @@ export class LocalStorageProgressRepository implements IProgressRepository {
     LocalStorageAdapter.set(STORAGE_KEY, records);
   }
 
+  async update(record: ProgressRecord): Promise<void> {
+    const records = await this.getAll();
+    LocalStorageAdapter.set(
+      STORAGE_KEY,
+      records.map((r) => (r.id === record.id ? record : r))
+    );
+  }
+
   async delete(id: string): Promise<void> {
     const records = await this.getAll();
     LocalStorageAdapter.set(

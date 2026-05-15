@@ -8,6 +8,7 @@ export interface UserStory {
   jiraUrl?: string;
   priority: Priority;
   points: number;
+  startDate?: string; // ISO date
   commitmentDate: string; // ISO date
   status: StoryStatus;
   progress: number; // 0-100

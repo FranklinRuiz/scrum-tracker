@@ -6,13 +6,13 @@ import { StoryDetail } from '../components/story/StoryDetail';
 import { SprintSelector } from '../components/sprint/SprintSelector';
 import { EmptyState } from '../components/common/EmptyState';
 import { Kanban } from 'lucide-react';
-import type { UserStory } from '../../domain/entities/UserStory';
 import type { StoryStatus } from '../../domain/value-objects/StoryStatus';
 
 export const KanbanPage: React.FC = () => {
-  const { sprints, stories, progressRecords, developers, selectedSprintId, setSelectedSprint, updateStory, addProgress } =
+  const { sprints, stories, progressRecords, developers, selectedSprintId, setSelectedSprint, updateStory, addProgress, editProgress, deleteProgress } =
     useAppStore();
-  const [selectedStory, setSelectedStory] = useState<UserStory | null>(null);
+  const [selectedStoryId, setSelectedStoryId] = useState<string | null>(null);
+  const selectedStory = selectedStoryId ? (stories.find((s) => s.id === selectedStoryId) ?? null) : null;
 
   const currentStories = selectedSprintId
     ? stories.filter((s) => s.sprintId === selectedSprintId)
@@ -32,18 +32,33 @@ export const KanbanPage: React.FC = () => {
     developerId: string;
     hoursWorked: number;
     comment: string;
-    progressPercentage: number;
     newStatus: StoryStatus;
     commitmentMet: boolean;
   }) => {
     try {
       await addProgress(data);
       toast.success('Progress added');
-      // Update selected story from store
-      const updated = stories.find((s) => s.id === data.storyId);
-      if (updated) setSelectedStory(updated);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Failed to add progress');
+    }
+  };
+
+  const handleEditProgress = async (recordId: string, data: {
+    storyId: string; developerId: string; hoursWorked: number;
+    comment: string; newStatus: StoryStatus; commitmentMet: boolean;
+  }) => {
+    try {
+      await editProgress({ recordId, ...data });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to edit progress');
+    }
+  };
+
+  const handleDeleteProgress = async (recordId: string, storyId: string) => {
+    try {
+      await deleteProgress(recordId, storyId);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Failed to delete progress');
     }
   };
 
@@ -88,7 +103,7 @@ export const KanbanPage: React.FC = () => {
             stories={currentStories}
             developers={developers}
             onStatusChange={handleStatusChange}
-            onCardClick={setSelectedStory}
+            onCardClick={(s) => setSelectedStoryId(s.id)}
           />
         )}
       </div>
@@ -99,9 +114,11 @@ export const KanbanPage: React.FC = () => {
           story={selectedStory}
           developers={developers}
           progressRecords={storyProgressRecords}
-          onClose={() => setSelectedStory(null)}
+          onClose={() => setSelectedStoryId(null)}
           onAddProgress={handleAddProgress}
-          onEdit={() => setSelectedStory(null)}
+          onEditProgress={handleEditProgress}
+          onDeleteProgress={handleDeleteProgress}
+          onEdit={() => setSelectedStoryId(null)}
         />
       )}
     </div>

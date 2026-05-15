@@ -32,19 +32,6 @@ export const DashboardPage: React.FC = () => {
     [stories, activeSprint]
   );
 
-  const completedPoints = useMemo(() => {
-    const storyIdsWithCommitmentMet = new Set(
-      progressRecords.filter((p) => p.commitmentMet).map((p) => p.storyId)
-    );
-    return activeSprintStories
-      .filter((s) => isTerminalStatus(s.status) || storyIdsWithCommitmentMet.has(s.id))
-      .reduce((sum, s) => sum + s.points, 0);
-  }, [activeSprintStories, progressRecords]);
-
-  const sprintProgress = useMemo(() => {
-    if (!activeSprint || activeSprint.committedPoints === 0) return 0;
-    return Math.round((completedPoints / activeSprint.committedPoints) * 100);
-  }, [activeSprint, completedPoints]);
 
   const blockedCount = useMemo(
     () => activeSprintStories.filter((s) => s.isBlocked).length,
@@ -149,12 +136,9 @@ export const DashboardPage: React.FC = () => {
     <div className="p-6 space-y-6">
       {/* Stats cards */}
       <StatsCards
-        sprintProgress={sprintProgress}
         blockedCount={blockedCount}
         atRiskCount={atRiskCount}
         teamVelocity={teamVelocity}
-        committedPoints={activeSprint.committedPoints}
-        completedPoints={completedPoints}
       />
 
       {/* Sprint progress + Alerts */}

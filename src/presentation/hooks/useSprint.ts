@@ -1,7 +1,8 @@
 import { useAppStore } from '../store/useAppStore';
 import { useMemo } from 'react';
-import { isTerminalStatus } from '../../domain/value-objects/StoryStatus';
 import type { Sprint } from '../../domain/entities/Sprint';
+
+const HOURS_PER_POINT = 8;
 
 export function useSprint() {
   const {
@@ -12,6 +13,7 @@ export function useSprint() {
     updateSprint,
     deleteSprint,
     stories,
+    progressRecords,
   } = useAppStore();
 
   const selectedSprint = useMemo(
@@ -37,15 +39,16 @@ export function useSprint() {
   }, [sprints]);
 
   const getSprintProgress = (sprintId: string) => {
-    const sprint = sprints.find((s) => s.id === sprintId);
-    if (!sprint) return 0;
     const sprintStories = stories.filter((s) => s.sprintId === sprintId);
-    const completedPoints = sprintStories
-      .filter((s) => isTerminalStatus(s.status))
-      .reduce((sum, s) => sum + s.points, 0);
-    return sprint.committedPoints > 0
-      ? Math.round((completedPoints / sprint.committedPoints) * 100)
-      : 0;
+    if (sprintStories.length === 0) return 0;
+
+    const storyIds = new Set(sprintStories.map((s) => s.id));
+    const totalHours = progressRecords
+      .filter((p) => storyIds.has(p.storyId))
+      .reduce((sum, p) => sum + p.hoursWorked, 0);
+    const totalCapacity = sprintStories.reduce((sum, s) => sum + s.points * HOURS_PER_POINT, 0);
+
+    return totalCapacity > 0 ? Math.round((totalHours / totalCapacity) * 100) : 0;
   };
 
   return {

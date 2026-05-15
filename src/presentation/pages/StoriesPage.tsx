@@ -64,11 +64,14 @@ export const StoriesPage: React.FC = () => {
     updateStory,
     deleteStory,
     addProgress,
+    editProgress,
+    deleteProgress,
   } = useAppStore();
 
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingStory, setEditingStory] = useState<UserStory | null>(null);
-  const [selectedStory, setSelectedStory] = useState<UserStory | null>(null);
+  const [selectedStoryId, setSelectedStoryId] = useState<string | null>(null);
+  const selectedStory = selectedStoryId ? (stories.find((s) => s.id === selectedStoryId) ?? null) : null;
   const [deletingStory, setDeletingStory] = useState<UserStory | null>(null);
   const [isLoading, setIsLoading] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
@@ -160,10 +163,7 @@ export const StoriesPage: React.FC = () => {
       });
       toast.success('Historia actualizada');
       setEditingStory(null);
-      if (selectedStory?.id === editingStory.id) {
-        const updated = stories.find((s) => s.id === editingStory.id);
-        if (updated) setSelectedStory(updated);
-      }
+      // selectedStory is derived from stories — refreshes automatically
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Error al actualizar la historia');
     } finally {
@@ -180,7 +180,7 @@ export const StoriesPage: React.FC = () => {
     try {
       await deleteStory(deletingStory.id);
       toast.success('Historia eliminada');
-      if (selectedStory?.id === deletingStory.id) setSelectedStory(null);
+      if (selectedStoryId === deletingStory.id) setSelectedStoryId(null);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Error al eliminar la historia');
     } finally {
@@ -193,17 +193,33 @@ export const StoriesPage: React.FC = () => {
     developerId: string;
     hoursWorked: number;
     comment: string;
-    progressPercentage: number;
     newStatus: StoryStatus;
     commitmentMet: boolean;
   }) => {
     try {
       await addProgress(data);
       toast.success('Avance registrado');
-      const updated = stories.find((s) => s.id === data.storyId);
-      if (updated) setSelectedStory(updated);
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Error al registrar el avance');
+    }
+  };
+
+  const handleEditProgress = async (recordId: string, data: {
+    storyId: string; developerId: string; hoursWorked: number;
+    comment: string; newStatus: StoryStatus; commitmentMet: boolean;
+  }) => {
+    try {
+      await editProgress({ recordId, ...data });
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al editar el avance');
+    }
+  };
+
+  const handleDeleteProgress = async (recordId: string, storyId: string) => {
+    try {
+      await deleteProgress(recordId, storyId);
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al eliminar el avance');
     }
   };
 
@@ -211,8 +227,6 @@ export const StoriesPage: React.FC = () => {
     try {
       await updateStory({ id: storyId, status: newStatus });
       toast.success('Estado actualizado');
-      const updated = stories.find((s) => s.id === storyId);
-      if (updated) setSelectedStory({ ...updated, status: newStatus });
     } catch (err) {
       toast.error(err instanceof Error ? err.message : 'Error al cambiar el estado');
     }
@@ -426,7 +440,7 @@ export const StoriesPage: React.FC = () => {
                 <StoryCard
                   story={story}
                   developers={developers}
-                  onClick={() => setSelectedStory(story)}
+                  onClick={() => setSelectedStoryId(story.id)}
                 />
                 {/* Action buttons on hover */}
                 <div className="absolute top-2 right-2 flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
@@ -491,12 +505,14 @@ export const StoriesPage: React.FC = () => {
           story={selectedStory}
           developers={developers}
           progressRecords={selectedStoryProgressRecords}
-          onClose={() => setSelectedStory(null)}
+          onClose={() => setSelectedStoryId(null)}
           onAddProgress={handleAddProgress}
+          onEditProgress={handleEditProgress}
+          onDeleteProgress={handleDeleteProgress}
           onStatusChange={handleStatusChange}
           onEdit={() => {
             setEditingStory(selectedStory);
-            setSelectedStory(null);
+            setSelectedStoryId(null);
           }}
         />
       )}

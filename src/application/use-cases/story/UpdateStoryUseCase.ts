@@ -9,6 +9,7 @@ export interface UpdateStoryInput {
   jiraUrl?: string;
   priority?: Priority;
   points?: number;
+  startDate?: string;
   commitmentDate?: string;
   status?: StoryStatus;
   progress?: number;
@@ -31,8 +32,8 @@ export class UpdateStoryUseCase {
     if (input.points !== undefined && input.points < 0) {
       throw new Error('Points must be non-negative');
     }
-    if (input.progress !== undefined && (input.progress < 0 || input.progress > 100)) {
-      throw new Error('Progress must be between 0 and 100');
+    if (input.progress !== undefined && input.progress < 0) {
+      throw new Error('Progress must be non-negative');
     }
 
     const updated: UserStory = {
@@ -41,6 +42,7 @@ export class UpdateStoryUseCase {
       jiraUrl: input.jiraUrl !== undefined ? (input.jiraUrl.trim() || undefined) : existing.jiraUrl,
       priority: input.priority ?? existing.priority,
       points: input.points ?? existing.points,
+      startDate: input.startDate !== undefined ? (input.startDate || undefined) : existing.startDate,
       commitmentDate: input.commitmentDate ?? existing.commitmentDate,
       status: input.status ?? existing.status,
       progress: input.progress ?? existing.progress,

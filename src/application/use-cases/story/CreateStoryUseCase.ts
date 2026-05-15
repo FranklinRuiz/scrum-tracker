@@ -10,6 +10,7 @@ export interface CreateStoryInput {
   jiraUrl?: string;
   priority: Priority;
   points: number;
+  startDate?: string;
   commitmentDate: string;
   assignees: string[];
 }
@@ -31,6 +32,7 @@ export class CreateStoryUseCase {
       jiraUrl: input.jiraUrl?.trim() || undefined,
       priority: input.priority,
       points: input.points,
+      startDate: input.startDate || undefined,
       commitmentDate: input.commitmentDate,
       status: 'open' as StoryStatus,
       progress: 0,

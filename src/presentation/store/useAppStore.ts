@@ -16,11 +16,13 @@ import { UpdateSprintUseCase } from '../../application/use-cases/sprint/UpdateSp
 import { CreateStoryUseCase } from '../../application/use-cases/story/CreateStoryUseCase';
 import { UpdateStoryUseCase } from '../../application/use-cases/story/UpdateStoryUseCase';
 import { AddProgressUseCase } from '../../application/use-cases/story/AddProgressUseCase';
+import { EditProgressUseCase, DeleteProgressUseCase } from '../../application/use-cases/story/EditProgressUseCase';
 import type { CreateSprintInput } from '../../application/use-cases/sprint/CreateSprintUseCase';
 import type { UpdateSprintInput } from '../../application/use-cases/sprint/UpdateSprintUseCase';
 import type { CreateStoryInput } from '../../application/use-cases/story/CreateStoryUseCase';
 import type { UpdateStoryInput } from '../../application/use-cases/story/UpdateStoryUseCase';
 import type { AddProgressInput } from '../../application/use-cases/story/AddProgressUseCase';
+import type { EditProgressInput } from '../../application/use-cases/story/EditProgressUseCase';
 import {
   MOCK_SPRINTS,
   MOCK_STORIES,
@@ -64,6 +66,8 @@ interface AppState {
 
   // Progress actions
   addProgress: (input: AddProgressInput) => Promise<ProgressRecord>;
+  editProgress: (input: EditProgressInput) => Promise<ProgressRecord>;
+  deleteProgress: (recordId: string, storyId: string) => Promise<void>;
 
   // Developer actions
   saveDeveloper: (developer: Developer) => Promise<void>;
@@ -179,19 +183,28 @@ export const useAppStore = create<AppState>()(
 
     deleteSprint: async (id) => {
       await sprintRepo.delete(id);
-      // Limpiar feriados y disponibilidad del sprint eliminado
-      const { holidays, availability } = get();
+      const { stories, progressRecords, holidays, availability } = get();
+
+      // Persist removal of stories and their progress records
+      const newStories = stories.filter((s) => s.sprintId !== id);
+      const deletedStoryIds = new Set(stories.filter((s) => s.sprintId === id).map((s) => s.id));
+      const newProgressRecords = progressRecords.filter((p) => !deletedStoryIds.has(p.storyId));
+      await (storyRepo as LocalStorageUserStoryRepository).saveAll(newStories);
+      await (progressRepo as LocalStorageProgressRepository).saveAll(newProgressRecords);
+
       const newHolidays = holidays.filter((h) => h.sprintId !== id);
       const newAvailability = availability.filter((a) => a.sprintId !== id);
       await holidayRepo.saveAll(newHolidays);
       await availabilityRepo.saveAll(newAvailability);
-      set((state) => ({
-        sprints: state.sprints.filter((s) => s.id !== id),
-        stories: state.stories.filter((s) => s.sprintId !== id),
+
+      set({
+        sprints: get().sprints.filter((s) => s.id !== id),
+        stories: newStories,
+        progressRecords: newProgressRecords,
         holidays: newHolidays,
         availability: newAvailability,
-        selectedSprintId: state.selectedSprintId === id ? null : state.selectedSprintId,
-      }));
+        selectedSprintId: get().selectedSprintId === id ? null : get().selectedSprintId,
+      });
     },
 
     setSelectedSprint: (id) => set({ selectedSprintId: id }),
@@ -231,6 +244,31 @@ export const useAppStore = create<AppState>()(
           : state.stories,
       }));
       return record;
+    },
+
+    editProgress: async (input) => {
+      const useCase = new EditProgressUseCase(progressRepo, storyRepo);
+      const record = await useCase.execute(input);
+      const updatedStory = await storyRepo.getById(input.storyId);
+      set((state) => ({
+        progressRecords: state.progressRecords.map((r) => (r.id === record.id ? record : r)),
+        stories: updatedStory
+          ? state.stories.map((s) => (s.id === updatedStory.id ? updatedStory : s))
+          : state.stories,
+      }));
+      return record;
+    },
+
+    deleteProgress: async (recordId, storyId) => {
+      const useCase = new DeleteProgressUseCase(progressRepo, storyRepo);
+      await useCase.execute(recordId, storyId);
+      const updatedStory = await storyRepo.getById(storyId);
+      set((state) => ({
+        progressRecords: state.progressRecords.filter((r) => r.id !== recordId),
+        stories: updatedStory
+          ? state.stories.map((s) => (s.id === updatedStory.id ? updatedStory : s))
+          : state.stories,
+      }));
     },
 
     saveDeveloper: async (developer) => {
