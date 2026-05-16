@@ -1,8 +1,8 @@
 import { v4 as uuidv4 } from 'uuid';
-import type { ProgressRecord } from '../../../domain/entities/ProgressRecord';
-import type { IProgressRepository } from '../../../domain/repositories/IProgressRepository';
-import type { IUserStoryRepository } from '../../../domain/repositories/IUserStoryRepository';
-import type { StoryStatus } from '../../../domain/value-objects/StoryStatus';
+import type { ProgressRecord } from '@/domain/entities/ProgressRecord';
+import type { IProgressRepository } from '@/domain/repositories/IProgressRepository';
+import type { IUserStoryRepository } from '@/domain/repositories/IUserStoryRepository';
+import type { StoryStatus } from '@/domain/value-objects/StoryStatus';
 
 const HOURS_PER_POINT = 8;
 

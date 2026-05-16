@@ -1,5 +1,5 @@
-import type { Developer } from '../../domain/entities/Developer';
-import type { IDeveloperRepository } from '../../domain/repositories/IDeveloperRepository';
+import type { Developer } from '@/domain/entities/Developer';
+import type { IDeveloperRepository } from '@/domain/repositories/IDeveloperRepository';
 import { LocalStorageAdapter } from '../persistence/LocalStorageAdapter';
 
 const STORAGE_KEY = 'scrum_developers';

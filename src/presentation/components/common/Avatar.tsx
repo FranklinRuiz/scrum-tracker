@@ -1,6 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import type { Developer } from '../../../domain/entities/Developer';
+import type { Developer } from '@/domain/entities/Developer';
 
 interface AvatarProps {
   developer: Developer;

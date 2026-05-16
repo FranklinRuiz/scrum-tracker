@@ -1,7 +1,7 @@
-import type { UserStory } from '../../../domain/entities/UserStory';
-import type { IUserStoryRepository } from '../../../domain/repositories/IUserStoryRepository';
-import type { Priority } from '../../../domain/value-objects/Priority';
-import type { StoryStatus } from '../../../domain/value-objects/StoryStatus';
+import type { UserStory } from '@/domain/entities/UserStory';
+import type { IUserStoryRepository } from '@/domain/repositories/IUserStoryRepository';
+import type { Priority } from '@/domain/value-objects/Priority';
+import type { StoryStatus } from '@/domain/value-objects/StoryStatus';
 
 export interface UpdateStoryInput {
   id: string;

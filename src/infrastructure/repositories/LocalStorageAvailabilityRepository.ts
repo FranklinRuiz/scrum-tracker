@@ -1,4 +1,4 @@
-import type { DeveloperAvailability } from '../../domain/entities/DeveloperAvailability';
+import type { DeveloperAvailability } from '@/domain/entities/DeveloperAvailability';
 import { LocalStorageAdapter } from '../persistence/LocalStorageAdapter';
 
 const KEY = 'scrum_availability';

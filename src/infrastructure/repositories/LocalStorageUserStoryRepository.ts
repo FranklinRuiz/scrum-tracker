@@ -1,5 +1,5 @@
-import type { UserStory } from '../../domain/entities/UserStory';
-import type { IUserStoryRepository } from '../../domain/repositories/IUserStoryRepository';
+import type { UserStory } from '@/domain/entities/UserStory';
+import type { IUserStoryRepository } from '@/domain/repositories/IUserStoryRepository';
 import { LocalStorageAdapter } from '../persistence/LocalStorageAdapter';
 
 const STORAGE_KEY = 'scrum_stories';

@@ -1,9 +1,9 @@
-import type { Sprint } from '../../domain/entities/Sprint';
-import type { UserStory } from '../../domain/entities/UserStory';
-import type { ProgressRecord } from '../../domain/entities/ProgressRecord';
-import type { Developer } from '../../domain/entities/Developer';
-import type { SprintHoliday } from '../../domain/entities/SprintHoliday';
-import type { DeveloperAvailability } from '../../domain/entities/DeveloperAvailability';
+import type { Sprint } from '@/domain/entities/Sprint';
+import type { UserStory } from '@/domain/entities/UserStory';
+import type { ProgressRecord } from '@/domain/entities/ProgressRecord';
+import type { Developer } from '@/domain/entities/Developer';
+import type { SprintHoliday } from '@/domain/entities/SprintHoliday';
+import type { DeveloperAvailability } from '@/domain/entities/DeveloperAvailability';
 
 export interface BackupData {
   version: string;

@@ -1,14 +1,14 @@
 import React from 'react';
 import { format, parseISO } from 'date-fns';
 import { CheckCircle2, Clock, Target, AlertTriangle } from 'lucide-react';
-import type { Sprint } from '../../../domain/entities/Sprint';
-import type { UserStory } from '../../../domain/entities/UserStory';
-import type { ProgressRecord } from '../../../domain/entities/ProgressRecord';
-import { isTerminalStatus } from '../../../domain/value-objects/StoryStatus';
+import type { Sprint } from '@/domain/entities/Sprint';
+import type { UserStory } from '@/domain/entities/UserStory';
+import type { ProgressRecord } from '@/domain/entities/ProgressRecord';
+import { isTerminalStatus } from '@/domain/value-objects/StoryStatus';
 import { Card } from '../common/Card';
 import { ProgressBar } from '../common/ProgressBar';
 import { Badge } from '../common/Badge';
-import { STORY_STATUS_COLORS, STORY_STATUS_LABELS } from '../../../domain/value-objects/StoryStatus';
+import { STORY_STATUS_COLORS, STORY_STATUS_LABELS } from '@/domain/value-objects/StoryStatus';
 
 const HOURS_PER_POINT = 8;
 

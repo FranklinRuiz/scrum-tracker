@@ -2,10 +2,10 @@ import React from 'react';
 import { useDroppable } from '@dnd-kit/core';
 import { SortableContext, verticalListSortingStrategy } from '@dnd-kit/sortable';
 import { clsx } from 'clsx';
-import type { UserStory } from '../../../domain/entities/UserStory';
-import type { Developer } from '../../../domain/entities/Developer';
-import type { StoryStatus } from '../../../domain/value-objects/StoryStatus';
-import { STORY_STATUS_LABELS } from '../../../domain/value-objects/StoryStatus';
+import type { UserStory } from '@/domain/entities/UserStory.ts';
+import type { Developer } from '@/domain/entities/Developer';
+import type { StoryStatus } from '@/domain/value-objects/StoryStatus';
+import { STORY_STATUS_LABELS } from '@/domain/value-objects/StoryStatus';
 import { KanbanCard } from './KanbanCard';
 
 interface KanbanColumnProps {

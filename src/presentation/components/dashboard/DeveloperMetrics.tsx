@@ -1,6 +1,6 @@
 import React from 'react';
 import { BookOpen, Target } from 'lucide-react';
-import type { DeveloperMetric } from '../../../application/use-cases/dashboard/GetDashboardDataUseCase';
+import type { DeveloperMetric } from '@/application/use-cases/dashboard/GetDashboardDataUseCase';
 import { Card } from '../common/Card';
 import { Avatar } from '../common/Avatar';
 import { ProgressBar } from '../common/ProgressBar';

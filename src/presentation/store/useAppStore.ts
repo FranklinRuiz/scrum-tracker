@@ -1,28 +1,28 @@
 import { create } from 'zustand';
-import type { Sprint } from '../../domain/entities/Sprint';
-import type { UserStory } from '../../domain/entities/UserStory';
-import type { ProgressRecord } from '../../domain/entities/ProgressRecord';
-import type { Developer } from '../../domain/entities/Developer';
-import type { SprintHoliday } from '../../domain/entities/SprintHoliday';
-import type { DeveloperAvailability } from '../../domain/entities/DeveloperAvailability';
-import { LocalStorageSprintRepository } from '../../infrastructure/repositories/LocalStorageSprintRepository';
-import { LocalStorageUserStoryRepository } from '../../infrastructure/repositories/LocalStorageUserStoryRepository';
-import { LocalStorageProgressRepository } from '../../infrastructure/repositories/LocalStorageProgressRepository';
-import { LocalStorageDeveloperRepository } from '../../infrastructure/repositories/LocalStorageDeveloperRepository';
-import { LocalStorageHolidayRepository } from '../../infrastructure/repositories/LocalStorageHolidayRepository';
-import { LocalStorageAvailabilityRepository } from '../../infrastructure/repositories/LocalStorageAvailabilityRepository';
-import { CreateSprintUseCase } from '../../application/use-cases/sprint/CreateSprintUseCase';
-import { UpdateSprintUseCase } from '../../application/use-cases/sprint/UpdateSprintUseCase';
-import { CreateStoryUseCase } from '../../application/use-cases/story/CreateStoryUseCase';
-import { UpdateStoryUseCase } from '../../application/use-cases/story/UpdateStoryUseCase';
-import { AddProgressUseCase } from '../../application/use-cases/story/AddProgressUseCase';
-import { EditProgressUseCase, DeleteProgressUseCase } from '../../application/use-cases/story/EditProgressUseCase';
-import type { CreateSprintInput } from '../../application/use-cases/sprint/CreateSprintUseCase';
-import type { UpdateSprintInput } from '../../application/use-cases/sprint/UpdateSprintUseCase';
-import type { CreateStoryInput } from '../../application/use-cases/story/CreateStoryUseCase';
-import type { UpdateStoryInput } from '../../application/use-cases/story/UpdateStoryUseCase';
-import type { AddProgressInput } from '../../application/use-cases/story/AddProgressUseCase';
-import type { EditProgressInput } from '../../application/use-cases/story/EditProgressUseCase';
+import type { Sprint } from '@/domain/entities/Sprint';
+import type { UserStory } from '@/domain/entities/UserStory';
+import type { ProgressRecord } from '@/domain/entities/ProgressRecord';
+import type { Developer } from '@/domain/entities/Developer';
+import type { SprintHoliday } from '@/domain/entities/SprintHoliday';
+import type { DeveloperAvailability } from '@/domain/entities/DeveloperAvailability';
+import { LocalStorageSprintRepository } from '@/infrastructure/repositories/LocalStorageSprintRepository';
+import { LocalStorageUserStoryRepository } from '@/infrastructure/repositories/LocalStorageUserStoryRepository';
+import { LocalStorageProgressRepository } from '@/infrastructure/repositories/LocalStorageProgressRepository';
+import { LocalStorageDeveloperRepository } from '@/infrastructure/repositories/LocalStorageDeveloperRepository';
+import { LocalStorageHolidayRepository } from '@/infrastructure/repositories/LocalStorageHolidayRepository';
+import { LocalStorageAvailabilityRepository } from '@/infrastructure/repositories/LocalStorageAvailabilityRepository';
+import { CreateSprintUseCase } from '@/application/use-cases/sprint/CreateSprintUseCase';
+import { UpdateSprintUseCase } from '@/application/use-cases/sprint/UpdateSprintUseCase';
+import { CreateStoryUseCase } from '@/application/use-cases/story/CreateStoryUseCase';
+import { UpdateStoryUseCase } from '@/application/use-cases/story/UpdateStoryUseCase';
+import { AddProgressUseCase } from '@/application/use-cases/story/AddProgressUseCase';
+import { EditProgressUseCase, DeleteProgressUseCase } from '@/application/use-cases/story/EditProgressUseCase';
+import type { CreateSprintInput } from '@/application/use-cases/sprint/CreateSprintUseCase';
+import type { UpdateSprintInput } from '@/application/use-cases/sprint/UpdateSprintUseCase';
+import type { CreateStoryInput } from '@/application/use-cases/story/CreateStoryUseCase';
+import type { UpdateStoryInput } from '@/application/use-cases/story/UpdateStoryUseCase';
+import type { AddProgressInput } from '@/application/use-cases/story/AddProgressUseCase';
+import type { EditProgressInput } from '@/application/use-cases/story/EditProgressUseCase';
 import {
   MOCK_SPRINTS,
   MOCK_STORIES,
@@ -30,7 +30,7 @@ import {
   MOCK_DEVELOPERS,
   MOCK_HOLIDAYS,
   MOCK_AVAILABILITY,
-} from '../../mockData';
+} from '@/mockData';
 
 // Repositories (singletons)
 const sprintRepo = new LocalStorageSprintRepository();

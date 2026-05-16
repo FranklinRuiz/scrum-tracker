@@ -1,5 +1,5 @@
-import type { ProgressRecord } from '../../domain/entities/ProgressRecord';
-import type { IProgressRepository } from '../../domain/repositories/IProgressRepository';
+import type { ProgressRecord } from '@/domain/entities/ProgressRecord';
+import type { IProgressRepository } from '@/domain/repositories/IProgressRepository';
 import { LocalStorageAdapter } from '../persistence/LocalStorageAdapter';
 
 const STORAGE_KEY = 'scrum_progress';

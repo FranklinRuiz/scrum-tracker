@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { Plus, GitBranch } from 'lucide-react';
-import { isTerminalStatus } from '../../domain/value-objects/StoryStatus';
+import { isTerminalStatus } from '@/domain/value-objects/StoryStatus.ts';
 import toast from 'react-hot-toast';
 import { useSprint } from '../hooks/useSprint';
 import { useAppStore } from '../store/useAppStore';
@@ -10,8 +10,8 @@ import { SprintCapacityPanel } from '../components/sprint/SprintCapacityPanel';
 import { Button } from '../components/common/Button';
 import { EmptyState } from '../components/common/EmptyState';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
-import type { Sprint } from '../../domain/entities/Sprint';
-import type { CreateSprintInput } from '../../application/use-cases/sprint/CreateSprintUseCase';
+import type { Sprint } from '@/domain/entities/Sprint.ts';
+import type { CreateSprintInput } from '@/application/use-cases/sprint/CreateSprintUseCase.ts';
 
 export const SprintsPage: React.FC = () => {
   const { sprints, selectedSprintId, setSelectedSprint, createSprint, updateSprint, deleteSprint, getSprintProgress } =

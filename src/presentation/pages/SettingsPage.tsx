@@ -17,14 +17,14 @@ import { clsx } from 'clsx';
 import toast from 'react-hot-toast';
 import { useTheme } from '../hooks/useTheme';
 import { useAppStore } from '../store/useAppStore';
-import { BackupService } from '../../infrastructure/persistence/BackupService';
+import { BackupService } from '@/infrastructure/persistence/BackupService.ts';
 import { Button } from '../components/common/Button';
 import { Card } from '../components/common/Card';
 import { Badge } from '../components/common/Badge';
 import { Avatar } from '../components/common/Avatar';
 import { Modal } from '../components/common/Modal';
 import { ConfirmDialog } from '../components/common/ConfirmDialog';
-import type { Developer } from '../../domain/entities/Developer';
+import type { Developer } from '@/domain/entities/Developer.ts';
 
 const AVATAR_COLORS = [
   '#6366f1', // indigo

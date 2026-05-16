@@ -1,9 +1,9 @@
-import type { UserStory } from '../../domain/entities/UserStory';
-import type { Sprint } from '../../domain/entities/Sprint';
-import type { ProgressRecord } from '../../domain/entities/ProgressRecord';
+import type { UserStory } from '@/domain/entities/UserStory';
+import type { Sprint } from '@/domain/entities/Sprint';
+import type { ProgressRecord } from '@/domain/entities/ProgressRecord';
 import { differenceInDays, parseISO } from 'date-fns';
-import { EFFECTIVE_SPRINT_DAYS } from '../../domain/entities/Sprint';
-import { isTerminalStatus } from '../../domain/value-objects/StoryStatus';
+import { EFFECTIVE_SPRINT_DAYS } from '@/domain/entities/Sprint';
+import { isTerminalStatus } from '@/domain/value-objects/StoryStatus';
 
 export type AlertSeverity = 'critical' | 'warning' | 'info';
 

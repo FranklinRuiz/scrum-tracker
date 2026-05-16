@@ -1,8 +1,8 @@
 import React, { useState } from 'react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
-import type { Sprint } from '../../../domain/entities/Sprint';
-import type { CreateSprintInput } from '../../../application/use-cases/sprint/CreateSprintUseCase';
+import type { Sprint } from '@/domain/entities/Sprint';
+import type { CreateSprintInput } from '@/application/use-cases/sprint/CreateSprintUseCase';
 
 interface SprintFormProps {
   isOpen: boolean;

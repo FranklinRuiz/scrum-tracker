@@ -1,9 +1,9 @@
-import type { ISprintRepository } from '../../../domain/repositories/ISprintRepository';
-import type { IUserStoryRepository } from '../../../domain/repositories/IUserStoryRepository';
-import type { IProgressRepository } from '../../../domain/repositories/IProgressRepository';
+import type { ISprintRepository } from '@/domain/repositories/ISprintRepository';
+import type { IUserStoryRepository } from '@/domain/repositories/IUserStoryRepository';
+import type { IProgressRepository } from '@/domain/repositories/IProgressRepository';
 import { differenceInDays, parseISO, format, eachDayOfInterval } from 'date-fns';
-import { EFFECTIVE_SPRINT_DAYS } from '../../../domain/entities/Sprint';
-import { isTerminalStatus } from '../../../domain/value-objects/StoryStatus';
+import { EFFECTIVE_SPRINT_DAYS } from '@/domain/entities/Sprint';
+import { isTerminalStatus } from '@/domain/value-objects/StoryStatus';
 
 export interface BurndownDataPoint {
   day: string;

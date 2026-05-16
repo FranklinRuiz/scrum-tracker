@@ -10,11 +10,11 @@ import { Modal } from '../components/common/Modal';
 import { EmptyState } from '../components/common/EmptyState';
 import { Select } from '../components/common/Select';
 import { SprintSelector } from '../components/sprint/SprintSelector';
-import type { UserStory } from '../../domain/entities/UserStory';
-import type { StoryStatus } from '../../domain/value-objects/StoryStatus';
-import type { Priority } from '../../domain/value-objects/Priority';
-import type { CreateStoryInput } from '../../application/use-cases/story/CreateStoryUseCase';
-import { STORY_STATUS_LABELS, isTerminalStatus } from '../../domain/value-objects/StoryStatus';
+import type { UserStory } from '@/domain/entities/UserStory.ts';
+import type { StoryStatus } from '@/domain/value-objects/StoryStatus.ts';
+import type { Priority } from '@/domain/value-objects/Priority.ts';
+import type { CreateStoryInput } from '@/application/use-cases/story/CreateStoryUseCase.ts';
+import { STORY_STATUS_LABELS, isTerminalStatus } from '@/domain/value-objects/StoryStatus.ts';
 import { clsx } from 'clsx';
 
 type SortField = 'priority' | 'points' | 'status' | 'title' | 'commitmentDate';

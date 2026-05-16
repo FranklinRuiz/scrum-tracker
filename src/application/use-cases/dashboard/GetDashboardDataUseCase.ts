@@ -1,12 +1,12 @@
-import type { ISprintRepository } from '../../../domain/repositories/ISprintRepository';
-import type { IUserStoryRepository } from '../../../domain/repositories/IUserStoryRepository';
-import type { IProgressRepository } from '../../../domain/repositories/IProgressRepository';
-import type { IDeveloperRepository } from '../../../domain/repositories/IDeveloperRepository';
-import type { Sprint } from '../../../domain/entities/Sprint';
-import type { UserStory } from '../../../domain/entities/UserStory';
-import type { ProgressRecord } from '../../../domain/entities/ProgressRecord';
-import type { Developer } from '../../../domain/entities/Developer';
-import { isTerminalStatus } from '../../../domain/value-objects/StoryStatus';
+import type { ISprintRepository } from '@/domain/repositories/ISprintRepository';
+import type { IUserStoryRepository } from '@/domain/repositories/IUserStoryRepository';
+import type { IProgressRepository } from '@/domain/repositories/IProgressRepository';
+import type { IDeveloperRepository } from '@/domain/repositories/IDeveloperRepository';
+import type { Sprint } from '@/domain/entities/Sprint';
+import type { UserStory } from '@/domain/entities/UserStory';
+import type { ProgressRecord } from '@/domain/entities/ProgressRecord';
+import type { Developer } from '@/domain/entities/Developer';
+import { isTerminalStatus } from '@/domain/value-objects/StoryStatus';
 
 export interface DeveloperMetric {
   developer: Developer;

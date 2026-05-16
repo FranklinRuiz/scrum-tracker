@@ -1,6 +1,6 @@
 import React from 'react';
 import { clsx } from 'clsx';
-import type { Sprint } from '../../../domain/entities/Sprint';
+import type { Sprint } from '@/domain/entities/Sprint';
 import { Select } from '../common/Select';
 
 interface SprintSelectorProps {

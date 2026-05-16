@@ -1,7 +1,7 @@
-import type { UserStory } from '../../domain/entities/UserStory';
-import type { ProgressRecord } from '../../domain/entities/ProgressRecord';
-import type { Sprint } from '../../domain/entities/Sprint';
-import { isTerminalStatus } from '../../domain/value-objects/StoryStatus';
+import type { UserStory } from '@/domain/entities/UserStory';
+import type { ProgressRecord } from '@/domain/entities/ProgressRecord';
+import type { Sprint } from '@/domain/entities/Sprint';
+import { isTerminalStatus } from '@/domain/value-objects/StoryStatus';
 
 export interface SprintProgress {
   committed: number;

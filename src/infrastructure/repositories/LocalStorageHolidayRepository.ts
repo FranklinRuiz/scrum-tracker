@@ -1,4 +1,4 @@
-import type { SprintHoliday } from '../../domain/entities/SprintHoliday';
+import type { SprintHoliday } from '@/domain/entities/SprintHoliday';
 import { LocalStorageAdapter } from '../persistence/LocalStorageAdapter';
 
 const KEY = 'scrum_holidays';

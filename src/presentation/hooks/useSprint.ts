@@ -1,6 +1,6 @@
 import { useAppStore } from '../store/useAppStore';
 import { useMemo } from 'react';
-import type { Sprint } from '../../domain/entities/Sprint';
+import type { Sprint } from '@/domain/entities/Sprint';
 
 const HOURS_PER_POINT = 8;
 

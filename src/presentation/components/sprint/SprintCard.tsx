@@ -2,7 +2,7 @@ import React from 'react';
 import { format, parseISO, differenceInDays } from 'date-fns';
 import { Calendar, Target, CheckCircle2, Clock, Pencil, Trash2 } from 'lucide-react';
 import { clsx } from 'clsx';
-import type { Sprint } from '../../../domain/entities/Sprint';
+import type { Sprint } from '@/domain/entities/Sprint';
 import { Card } from '../common/Card';
 import { Badge } from '../common/Badge';
 import { ProgressBar } from '../common/ProgressBar';

@@ -1,5 +1,5 @@
-import type { Sprint } from '../../domain/entities/Sprint';
-import type { ISprintRepository } from '../../domain/repositories/ISprintRepository';
+import type { Sprint } from '@/domain/entities/Sprint';
+import type { ISprintRepository } from '@/domain/repositories/ISprintRepository';
 import { LocalStorageAdapter } from '../persistence/LocalStorageAdapter';
 
 const STORAGE_KEY = 'scrum_sprints';

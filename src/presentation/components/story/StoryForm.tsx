@@ -2,13 +2,13 @@ import React, { useState, useEffect } from 'react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { Select } from '../common/Select';
-import type { UserStory } from '../../../domain/entities/UserStory';
-import type { Sprint } from '../../../domain/entities/Sprint';
-import type { Developer } from '../../../domain/entities/Developer';
-import type { CreateStoryInput } from '../../../application/use-cases/story/CreateStoryUseCase';
-import { STORY_STATUS_ORDER, STORY_STATUS_LABELS } from '../../../domain/value-objects/StoryStatus';
-import type { Priority } from '../../../domain/value-objects/Priority';
-import type { StoryStatus } from '../../../domain/value-objects/StoryStatus';
+import type { UserStory } from '@/domain/entities/UserStory';
+import type { Sprint } from '@/domain/entities/Sprint';
+import type { Developer } from '@/domain/entities/Developer';
+import type { CreateStoryInput } from '@/application/use-cases/story/CreateStoryUseCase';
+import { STORY_STATUS_ORDER, STORY_STATUS_LABELS } from '@/domain/value-objects/StoryStatus';
+import type { Priority } from '@/domain/value-objects/Priority';
+import type { StoryStatus } from '@/domain/value-objects/StoryStatus';
 
 interface StoryFormProps {
   isOpen: boolean;

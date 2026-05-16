@@ -9,7 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import type { VelocityDataPoint } from '../../../application/use-cases/dashboard/GetDashboardDataUseCase';
+import type { VelocityDataPoint } from '@/application/use-cases/dashboard/GetDashboardDataUseCase';
 import { Card } from '../common/Card';
 
 interface VelocityChartProps {

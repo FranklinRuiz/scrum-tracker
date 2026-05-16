@@ -9,7 +9,7 @@ import {
   Legend,
   ResponsiveContainer,
 } from 'recharts';
-import type { BurndownDataPoint } from '../../../application/use-cases/sprint/GetSprintMetricsUseCase';
+import type { BurndownDataPoint } from '@/application/use-cases/sprint/GetSprintMetricsUseCase';
 import { Card } from '../common/Card';
 
 interface BurndownChartProps {

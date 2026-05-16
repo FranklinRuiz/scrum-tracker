@@ -1,6 +1,6 @@
 import { v4 as uuidv4 } from 'uuid';
-import type { Sprint } from '../../../domain/entities/Sprint';
-import type { ISprintRepository } from '../../../domain/repositories/ISprintRepository';
+import type { Sprint } from '@/domain/entities/Sprint';
+import type { ISprintRepository } from '@/domain/repositories/ISprintRepository';
 
 export interface CreateSprintInput {
   name: string;

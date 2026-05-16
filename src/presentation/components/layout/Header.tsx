@@ -2,7 +2,7 @@ import React, { useRef, useState } from 'react';
 import { Moon, Sun, Download, Upload } from 'lucide-react';
 import { useTheme } from '../../hooks/useTheme';
 import { useAppStore } from '../../store/useAppStore';
-import { BackupService } from '../../../infrastructure/persistence/BackupService';
+import { BackupService } from '@/infrastructure/persistence/BackupService.ts';
 import { Button } from '../common/Button';
 import { ConfirmDialog } from '../common/ConfirmDialog';
 import toast from 'react-hot-toast';

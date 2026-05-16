@@ -10,10 +10,10 @@ import {
   DragOverlay,
   closestCorners,
 } from '@dnd-kit/core';
-import type { UserStory } from '../../../domain/entities/UserStory';
-import type { Developer } from '../../../domain/entities/Developer';
-import type { StoryStatus } from '../../../domain/value-objects/StoryStatus';
-import { STORY_STATUS_ORDER } from '../../../domain/value-objects/StoryStatus';
+import type { UserStory } from '@/domain/entities/UserStory';
+import type { Developer } from '@/domain/entities/Developer';
+import type { StoryStatus } from '@/domain/value-objects/StoryStatus';
+import { STORY_STATUS_ORDER } from '@/domain/value-objects/StoryStatus';
 import { KanbanColumn } from './KanbanColumn';
 import { KanbanCard } from './KanbanCard';
 

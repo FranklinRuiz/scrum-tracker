@@ -1,7 +1,7 @@
 import React from 'react';
 import { AlertTriangle, Info, XCircle } from 'lucide-react';
 import { clsx } from 'clsx';
-import type { Alert, AlertSeverity } from '../../../application/services/AlertService';
+import type { Alert, AlertSeverity } from '@/application/services/AlertService';
 import { Card } from '../common/Card';
 
 interface AlertsPanelProps {

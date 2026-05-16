@@ -3,11 +3,11 @@ import { CheckCircle2 } from 'lucide-react';
 import { Modal } from '../common/Modal';
 import { Button } from '../common/Button';
 import { Select } from '../common/Select';
-import type { UserStory } from '../../../domain/entities/UserStory';
-import type { Developer } from '../../../domain/entities/Developer';
-import type { ProgressRecord } from '../../../domain/entities/ProgressRecord';
-import type { StoryStatus } from '../../../domain/value-objects/StoryStatus';
-import { STORY_STATUS_ORDER, STORY_STATUS_LABELS } from '../../../domain/value-objects/StoryStatus';
+import type { UserStory } from '@/domain/entities/UserStory';
+import type { Developer } from '@/domain/entities/Developer';
+import type { ProgressRecord } from '@/domain/entities/ProgressRecord';
+import type { StoryStatus } from '@/domain/value-objects/StoryStatus';
+import { STORY_STATUS_ORDER, STORY_STATUS_LABELS } from '@/domain/value-objects/StoryStatus';
 
 interface ProgressFormProps {
   isOpen: boolean;

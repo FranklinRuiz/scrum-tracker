@@ -1,7 +1,7 @@
 import { useAppStore } from '../store/useAppStore';
 import { useMemo } from 'react';
-import type { StoryStatus } from '../../domain/value-objects/StoryStatus';
-import { STORY_STATUS_ORDER } from '../../domain/value-objects/StoryStatus';
+import type { StoryStatus } from '@/domain/value-objects/StoryStatus';
+import { STORY_STATUS_ORDER } from '@/domain/value-objects/StoryStatus';
 
 export function useStories(sprintId?: string) {
   const { stories, progressRecords, createStory, updateStory, deleteStory, addProgress } =

@@ -1,10 +1,10 @@
 import React, { useMemo } from 'react';
 import { useAppStore } from '../store/useAppStore';
 import { useAlerts } from '../hooks/useAlerts';
-import { GetSprintMetricsUseCase } from '../../application/use-cases/sprint/GetSprintMetricsUseCase';
-import { LocalStorageSprintRepository } from '../../infrastructure/repositories/LocalStorageSprintRepository';
-import { LocalStorageUserStoryRepository } from '../../infrastructure/repositories/LocalStorageUserStoryRepository';
-import { LocalStorageProgressRepository } from '../../infrastructure/repositories/LocalStorageProgressRepository';
+import { GetSprintMetricsUseCase } from '@/application/use-cases/sprint/GetSprintMetricsUseCase.ts';
+import { LocalStorageSprintRepository } from '@/infrastructure/repositories/LocalStorageSprintRepository.ts';
+import { LocalStorageUserStoryRepository } from '@/infrastructure/repositories/LocalStorageUserStoryRepository';
+import { LocalStorageProgressRepository } from '@/infrastructure/repositories/LocalStorageProgressRepository';
 import { StatsCards } from '../components/dashboard/StatsCards';
 import { BurndownChart } from '../components/dashboard/BurndownChart';
 import { VelocityChart } from '../components/dashboard/VelocityChart';
@@ -13,10 +13,10 @@ import { DeveloperMetrics } from '../components/dashboard/DeveloperMetrics';
 import { AlertsPanel } from '../components/dashboard/AlertsPanel';
 import { EmptyState } from '../components/common/EmptyState';
 import { LayoutDashboard } from 'lucide-react';
-import type { BurndownDataPoint } from '../../application/use-cases/sprint/GetSprintMetricsUseCase';
-import type { VelocityDataPoint } from '../../application/use-cases/dashboard/GetDashboardDataUseCase';
-import { isTerminalStatus } from '../../domain/value-objects/StoryStatus';
-import { getEffectiveDays, getDevCapacity } from '../../domain/entities/Sprint';
+import type { BurndownDataPoint } from '@/application/use-cases/sprint/GetSprintMetricsUseCase';
+import type { VelocityDataPoint } from '@/application/use-cases/dashboard/GetDashboardDataUseCase';
+import { isTerminalStatus } from '@/domain/value-objects/StoryStatus';
+import { getEffectiveDays, getDevCapacity } from '@/domain/entities/Sprint';
 
 export const DashboardPage: React.FC = () => {
   const { sprints, stories, progressRecords, developers, holidays, availability } = useAppStore();

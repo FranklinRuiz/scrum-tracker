@@ -6,7 +6,7 @@ import { StoryDetail } from '../components/story/StoryDetail';
 import { SprintSelector } from '../components/sprint/SprintSelector';
 import { EmptyState } from '../components/common/EmptyState';
 import { Kanban } from 'lucide-react';
-import type { StoryStatus } from '../../domain/value-objects/StoryStatus';
+import type { StoryStatus } from '@/domain/value-objects/StoryStatus.ts';
 
 export const KanbanPage: React.FC = () => {
   const { sprints, stories, progressRecords, developers, selectedSprintId, setSelectedSprint, updateStory, addProgress, editProgress, deleteProgress } =

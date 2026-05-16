@@ -1,7 +1,7 @@
 import { useMemo } from 'react';
 import { useAppStore } from '../store/useAppStore';
-import { AlertService } from '../../application/services/AlertService';
-import type { Alert } from '../../application/services/AlertService';
+import { AlertService } from '@/application/services/AlertService';
+import type { Alert } from '@/application/services/AlertService';
 
 export function useAlerts() {
   const { sprints, stories, progressRecords } = useAppStore();

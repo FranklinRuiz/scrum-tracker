@@ -1,7 +1,7 @@
 import React, { useMemo, useState } from 'react';
 import { format, parseISO, eachDayOfInterval, isWeekend } from 'date-fns';
 import { es } from 'date-fns/locale';
-import { Calendar, AlertTriangle, CheckCircle2, Clock } from 'lucide-react';
+import { Calendar, AlertTriangle } from 'lucide-react';
 import { clsx } from 'clsx';
 import { useAppStore } from '../store/useAppStore';
 import { SprintSelector } from '../components/sprint/SprintSelector';
@@ -9,10 +9,10 @@ import { Badge } from '../components/common/Badge';
 import { Avatar } from '../components/common/Avatar';
 import { EmptyState } from '../components/common/EmptyState';
 import { StoryDetail } from '../components/story/StoryDetail';
-import { STORY_STATUS_COLORS, STORY_STATUS_LABELS, isTerminalStatus } from '../../domain/value-objects/StoryStatus';
-import { PRIORITY_COLORS } from '../../domain/value-objects/Priority';
-import type { UserStory } from '../../domain/entities/UserStory';
-import type { StoryStatus } from '../../domain/value-objects/StoryStatus';
+import { STORY_STATUS_COLORS, STORY_STATUS_LABELS, isTerminalStatus } from '@/domain/value-objects/StoryStatus.ts';
+import { PRIORITY_COLORS } from '@/domain/value-objects/Priority.ts';
+import type { UserStory } from '@/domain/entities/UserStory.ts';
+import type { StoryStatus } from '@/domain/value-objects/StoryStatus.ts';
 import toast from 'react-hot-toast';
 
 export const TimelinePage: React.FC = () => {
@@ -321,10 +321,6 @@ export const TimelinePage: React.FC = () => {
               {/* Story rows */}
               {sortedStories.map((story) => {
                 const assignedDevs = developers.filter((d) => story.assignees.includes(d.id));
-                const isOverdue =
-                  !isTerminalStatus(story.status) &&
-                  story.commitmentDate &&
-                  ds(parseISO(story.commitmentDate)) < todayStr;
 
                 return (
                   <div
@@ -426,39 +422,18 @@ export const TimelinePage: React.FC = () => {
                         >
                           <div
                             className={clsx(
-                              'w-full h-7 rounded-md flex items-center px-2 gap-1.5 shadow-sm transition-all hover:shadow-md',
+                              'w-full h-7 rounded-md flex items-center gap-1.5 shadow-sm transition-all hover:shadow-md',
                               getStatusBarColor(story),
                               story.isBlocked && 'animate-pulse'
                             )}
                           >
-                            <div className="relative flex-1 h-full flex items-center overflow-hidden rounded">
+                            <div className="relative flex-1 h-full flex items-center justify-end overflow-hidden rounded">
                               <div
                                 className="absolute left-0 top-0 bottom-0 bg-white/20 rounded"
                                 style={{ width: `${Math.min(100, story.progress)}%` }}
                               />
                               <span className="relative text-white text-xs font-semibold truncate px-1">
-                                {story.progress}%
-                              </span>
-                            </div>
-                            <div
-                              className={clsx(
-                                'flex items-center gap-1 shrink-0',
-                                isOverdue ? 'text-yellow-200' : 'text-white/80'
-                              )}
-                            >
-                              {isTerminalStatus(story.status) ? (
-                                <CheckCircle2 className="h-3.5 w-3.5" />
-                              ) : isOverdue ? (
-                                <AlertTriangle className="h-3.5 w-3.5" />
-                              ) : (
-                                <Clock className="h-3.5 w-3.5" />
-                              )}
-                              <span className="text-xs hidden sm:inline">
-                                {isTerminalStatus(story.status)
-                                  ? story.commitmentDate
-                                    ? format(parseISO(story.commitmentDate), "d 'de' MMM", { locale: es })
-                                    : '—'
-                                  : 'Hoy'}
+                                Avance al {story.progress}%
                               </span>
                             </div>
                           </div>

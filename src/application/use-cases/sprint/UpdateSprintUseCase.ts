@@ -1,5 +1,5 @@
-import type { Sprint, SprintStatus } from '../../../domain/entities/Sprint';
-import type { ISprintRepository } from '../../../domain/repositories/ISprintRepository';
+import type { Sprint, SprintStatus } from '@/domain/entities/Sprint';
+import type { ISprintRepository } from '@/domain/repositories/ISprintRepository';
 
 export interface UpdateSprintInput {
   id: string;
