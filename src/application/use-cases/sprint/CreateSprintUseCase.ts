@@ -24,6 +24,15 @@ export class CreateSprintUseCase {
     if (input.committedPoints < 0) throw new Error('Committed points must be non-negative');
 
     const now = new Date().toISOString();
+    const today = new Date();
+    today.setHours(0, 0, 0, 0);
+    const start = new Date(input.startDate);
+    const end = new Date(input.endDate);
+
+    let status: Sprint['status'] = 'planned';
+    if (start <= today && today <= end) status = 'active';
+    else if (end < today) status = 'completed';
+
     const sprint: Sprint = {
       id: uuidv4(),
       name: input.name.trim(),
@@ -31,7 +40,7 @@ export class CreateSprintUseCase {
       startDate: input.startDate,
       endDate: input.endDate,
       committedPoints: input.committedPoints,
-      status: 'planned',
+      status,
       createdAt: now,
       updatedAt: now,
     };

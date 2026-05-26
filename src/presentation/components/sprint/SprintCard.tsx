@@ -1,6 +1,6 @@
 import React from 'react';
 import { format, parseISO, differenceInDays } from 'date-fns';
-import { Calendar, Target, CheckCircle2, Clock, Pencil, Trash2 } from 'lucide-react';
+import { Calendar, Target, CheckCircle2, Clock, Pencil, Trash2, FlagOff } from 'lucide-react';
 import { clsx } from 'clsx';
 import type { Sprint } from '@/domain/entities/Sprint';
 import { Card } from '../common/Card';
@@ -16,6 +16,7 @@ interface SprintCardProps {
   onEdit: (sprint: Sprint) => void;
   onDelete: (sprint: Sprint) => void;
   onSelect: (sprint: Sprint) => void;
+  onComplete: (sprint: Sprint) => void;
   isSelected: boolean;
 }
 
@@ -33,6 +34,7 @@ export const SprintCard: React.FC<SprintCardProps> = ({
   onEdit,
   onDelete,
   onSelect,
+  onComplete,
   isSelected,
 }) => {
   const start = parseISO(sprint.startDate);
@@ -59,6 +61,17 @@ export const SprintCard: React.FC<SprintCardProps> = ({
           <p className="text-sm text-gray-500 dark:text-gray-400 line-clamp-2">{sprint.goal}</p>
         </div>
         <div className="flex items-center gap-1 ml-2 shrink-0">
+          {sprint.status === 'active' && (
+            <Button
+              variant="ghost"
+              size="sm"
+              onClick={(e) => { e.stopPropagation(); onComplete(sprint); }}
+              className="text-green-600 hover:text-green-800 hover:bg-green-50 dark:text-green-400 dark:hover:bg-green-900/20"
+              title="Finalizar sprint"
+            >
+              <FlagOff className="h-4 w-4" />
+            </Button>
+          )}
           <Button
             variant="ghost"
             size="sm"

@@ -18,14 +18,30 @@ export class UpdateSprintUseCase {
     const existing = await this.sprintRepository.getById(input.id);
     if (!existing) throw new Error(`Sprint not found: ${input.id}`);
 
+    const startDate = input.startDate ?? existing.startDate;
+    const endDate = input.endDate ?? existing.endDate;
+
+    let status: Sprint['status'];
+    if (input.status !== undefined) {
+      status = input.status;
+    } else {
+      const today = new Date();
+      today.setHours(0, 0, 0, 0);
+      const start = new Date(startDate);
+      const end = new Date(endDate);
+      if (start <= today && today <= end) status = 'active';
+      else if (end < today) status = 'completed';
+      else status = 'planned';
+    }
+
     const updated: Sprint = {
       ...existing,
       name: input.name?.trim() ?? existing.name,
       goal: input.goal?.trim() ?? existing.goal,
-      startDate: input.startDate ?? existing.startDate,
-      endDate: input.endDate ?? existing.endDate,
+      startDate,
+      endDate,
       committedPoints: input.committedPoints ?? existing.committedPoints,
-      status: input.status ?? existing.status,
+      status,
       updatedAt: new Date().toISOString(),
     };
 

@@ -33,6 +33,7 @@ export const SprintsPage: React.FC = () => {
   const [isFormOpen, setIsFormOpen] = useState(false);
   const [editingSprint, setEditingSprint] = useState<Sprint | null>(null);
   const [deletingSprint, setDeletingSprint] = useState<Sprint | null>(null);
+  const [completingSprint, setCompletingSprint] = useState<Sprint | null>(null);
   const [isLoading, setIsLoading] = useState(false);
 
   const handleCreate = async (input: CreateSprintInput) => {
@@ -64,6 +65,22 @@ export const SprintsPage: React.FC = () => {
 
   const handleDelete = (sprint: Sprint) => {
     setDeletingSprint(sprint);
+  };
+
+  const handleComplete = (sprint: Sprint) => {
+    setCompletingSprint(sprint);
+  };
+
+  const handleConfirmComplete = async () => {
+    if (!completingSprint) return;
+    try {
+      await updateSprint({ id: completingSprint.id, status: 'completed' });
+      toast.success('Sprint finalizado correctamente');
+    } catch (err) {
+      toast.error(err instanceof Error ? err.message : 'Error al finalizar el sprint');
+    } finally {
+      setCompletingSprint(null);
+    }
   };
 
   const handleConfirmDeleteSprint = async () => {
@@ -145,6 +162,7 @@ export const SprintsPage: React.FC = () => {
                     totalStories={stories.filter((s) => s.sprintId === sprint.id).length}
                     onEdit={setEditingSprint}
                     onDelete={handleDelete}
+                    onComplete={handleComplete}
                     onSelect={(s) => setSelectedSprint(s.id)}
                     isSelected={selectedSprintId === sprint.id}
                   />
@@ -168,6 +186,7 @@ export const SprintsPage: React.FC = () => {
                     totalStories={stories.filter((s) => s.sprintId === sprint.id).length}
                     onEdit={setEditingSprint}
                     onDelete={handleDelete}
+                    onComplete={handleComplete}
                     onSelect={(s) => setSelectedSprint(s.id)}
                     isSelected={selectedSprintId === sprint.id}
                   />
@@ -191,6 +210,7 @@ export const SprintsPage: React.FC = () => {
                     totalStories={stories.filter((s) => s.sprintId === sprint.id).length}
                     onEdit={setEditingSprint}
                     onDelete={handleDelete}
+                    onComplete={handleComplete}
                     onSelect={(s) => setSelectedSprint(s.id)}
                     isSelected={selectedSprintId === sprint.id}
                   />
@@ -248,6 +268,21 @@ export const SprintsPage: React.FC = () => {
             : ''
         }
         detail="Esta acción no se puede deshacer."
+      />
+
+      <ConfirmDialog
+        isOpen={!!completingSprint}
+        onClose={() => setCompletingSprint(null)}
+        onConfirm={handleConfirmComplete}
+        title="Finalizar sprint"
+        confirmLabel="Finalizar"
+        variant="warning"
+        message={
+          completingSprint
+            ? <>¿Finalizar el sprint <strong className="text-gray-900 dark:text-white">"{completingSprint.name}"</strong>? El sprint pasará al estado Completado.</>
+            : ''
+        }
+        detail="Podrás consultar el sprint en la sección de completados."
       />
     </div>
   );

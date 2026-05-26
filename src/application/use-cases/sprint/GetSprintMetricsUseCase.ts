@@ -3,7 +3,6 @@ import type { IUserStoryRepository } from '@/domain/repositories/IUserStoryRepos
 import type { IProgressRepository } from '@/domain/repositories/IProgressRepository';
 import { differenceInDays, parseISO, format, eachDayOfInterval } from 'date-fns';
 import { EFFECTIVE_SPRINT_DAYS } from '@/domain/entities/Sprint';
-import { isTerminalStatus } from '@/domain/value-objects/StoryStatus';
 
 export interface BurndownDataPoint {
   day: string;
@@ -42,8 +41,14 @@ export class GetSprintMetricsUseCase {
     );
 
     const totalPoints = sprint.committedPoints;
+
+    // Una HU se considera lograda cuando tiene al menos un registro con commitmentMet = true
+    const storyIdsWithCommitmentMet = new Set(
+      sprintProgress.filter((p) => p.commitmentMet).map((p) => p.storyId)
+    );
+
     const completedPoints = stories
-      .filter((s) => isTerminalStatus(s.status))
+      .filter((s) => storyIdsWithCommitmentMet.has(s.id))
       .reduce((sum, s) => sum + s.points, 0);
     const remainingPoints = Math.max(0, totalPoints - completedPoints);
 
@@ -66,24 +71,17 @@ export class GetSprintMetricsUseCase {
         totalPoints - (totalPoints / EFFECTIVE_SPRINT_DAYS) * effectiveDay
       );
 
-      // Calculate actual completed points up to this day
+      // Una HU se considera lograda el día en que aparece el primer registro con commitmentMet = true
       const dayStr = format(day, 'yyyy-MM-dd');
       const completedByDay = stories
-        .filter((story) => {
-          const latestProgress = sprintProgress
-            .filter((p) => p.storyId === story.id && p.timestamp.startsWith(dayStr))
-            .sort((a, b) => b.timestamp.localeCompare(a.timestamp))[0];
-          if (latestProgress) return isTerminalStatus(latestProgress.newStatus);
-
-          const allStoryProgress = sprintProgress
-            .filter((p) => p.storyId === story.id && p.timestamp <= dayStr + 'T23:59:59')
-            .sort((a, b) => b.timestamp.localeCompare(a.timestamp));
-
-          if (allStoryProgress[0]) {
-            return isTerminalStatus(allStoryProgress[0].newStatus);
-          }
-          return false;
-        })
+        .filter((story) =>
+          sprintProgress.some(
+            (p) =>
+              p.storyId === story.id &&
+              p.commitmentMet === true &&
+              p.timestamp <= dayStr + 'T23:59:59'
+          )
+        )
         .reduce((sum, s) => sum + s.points, 0);
 
       const actualRemaining = Math.max(0, totalPoints - completedByDay);
@@ -101,7 +99,7 @@ export class GetSprintMetricsUseCase {
     const atRiskCount = stories.filter(
       (s) =>
         !s.isBlocked &&
-        !isTerminalStatus(s.status) &&
+        !storyIdsWithCommitmentMet.has(s.id) &&
         s.progress < expectedProgress - 10
     ).length;
 
