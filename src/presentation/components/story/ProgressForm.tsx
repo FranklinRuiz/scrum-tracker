@@ -25,6 +25,7 @@ interface ProgressFormProps {
     comment: string;
     newStatus: StoryStatus;
     commitmentMet: boolean;
+    date: string;
   }) => Promise<void>;
   isLoading?: boolean;
 }
@@ -39,6 +40,8 @@ export const ProgressForm: React.FC<ProgressFormProps> = ({
   onSubmit,
   isLoading = false,
 }) => {
+  const todayStr = new Date().toISOString().slice(0, 10);
+
   const isEditMode = !!editRecord;
   const [developerId, setDeveloperId] = useState(
     editRecord?.developerId ?? story.assignees[0] ?? developers[0]?.id ?? ''
@@ -49,6 +52,9 @@ export const ProgressForm: React.FC<ProgressFormProps> = ({
   const [comment, setComment] = useState(editRecord?.comment ?? '');
   const [newStatus, setNewStatus] = useState<StoryStatus>(editRecord?.newStatus ?? story.status);
   const [commitmentMet, setCommitmentMet] = useState(editRecord?.commitmentMet ?? false);
+  const [date, setDate] = useState(
+    editRecord ? editRecord.timestamp.slice(0, 10) : todayStr
+  );
   const [errors, setErrors] = useState<Record<string, string>>({});
 
   const hoursPerPoint = 8;
@@ -78,6 +84,7 @@ export const ProgressForm: React.FC<ProgressFormProps> = ({
       comment: comment.trim(),
       newStatus,
       commitmentMet,
+      date,
     });
   };
 
@@ -120,18 +127,32 @@ export const ProgressForm: React.FC<ProgressFormProps> = ({
           {errors.developerId && <p className={errorClass}>{errors.developerId}</p>}
         </div>
 
-        <div>
-          <label className={labelClass}>Horas trabajadas</label>
-          <input
-            type="number"
-            min="0"
-            step="0.5"
-            className={inputClass}
-            value={hoursWorked}
-            onChange={(e) => setHoursWorked(e.target.value)}
-          />
-          {errors.hoursWorked && <p className={errorClass}>{errors.hoursWorked}</p>}
-          <p className="text-xs text-gray-500 dark:text-gray-400 mt-1">
+        <div className="grid grid-cols-2 gap-3">
+          <div>
+            <label className={labelClass}>Fecha</label>
+            <input
+              type="date"
+              className={inputClass}
+              value={date}
+              max={todayStr}
+              onChange={(e) => setDate(e.target.value)}
+            />
+          </div>
+          <div>
+            <label className={labelClass}>Horas trabajadas</label>
+            <input
+              type="number"
+              min="0"
+              step="0.5"
+              className={inputClass}
+              value={hoursWorked}
+              onChange={(e) => setHoursWorked(e.target.value)}
+            />
+            {errors.hoursWorked && <p className={errorClass}>{errors.hoursWorked}</p>}
+          </div>
+        </div>
+        {!errors.hoursWorked && (
+          <p className="text-xs text-gray-500 dark:text-gray-400 -mt-2">
             Avance proyectado:{' '}
             <span className={`font-medium ${projectedProgress > 100 ? 'text-amber-600 dark:text-amber-400' : 'text-indigo-600 dark:text-indigo-400'}`}>
               {projectedProgress}%
@@ -141,7 +162,7 @@ export const ProgressForm: React.FC<ProgressFormProps> = ({
             )}
             {' '}(1 punto = {hoursPerPoint}h)
           </p>
-        </div>
+        )}
 
         <div>
           <label className={labelClass}>Nuevo estado</label>

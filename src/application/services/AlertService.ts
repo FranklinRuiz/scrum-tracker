@@ -28,6 +28,13 @@ export class AlertService {
     const daysElapsed = Math.max(0, differenceInDays(now, sprintStart));
     const expectedProgress = Math.min(100, (daysElapsed / EFFECTIVE_SPRINT_DAYS) * 100);
 
+    const commitmentMetIds = new Set(
+      progressRecords.filter((p) => p.commitmentMet).map((p) => p.storyId)
+    );
+
+    const isCompleted = (storyId: string, status: UserStory['status']) =>
+      isTerminalStatus(status) || commitmentMetIds.has(storyId);
+
     for (const story of stories) {
       // Regla 1: HU bloqueada
       if (story.isBlocked) {
@@ -44,7 +51,7 @@ export class AlertService {
       // Regla 2: Avance menor al esperado
       if (
         !story.isBlocked &&
-        !isTerminalStatus(story.status) &&
+        !isCompleted(story.id, story.status) &&
         story.progress < expectedProgress - 10 &&
         daysElapsed > 1
       ) {
@@ -61,7 +68,7 @@ export class AlertService {
       // Regla 3: Fecha compromiso vencida y no completada
       if (
         story.commitmentDate &&
-        !isTerminalStatus(story.status) &&
+        !isCompleted(story.id, story.status) &&
         new Date(story.commitmentDate) < now
       ) {
         alerts.push({
@@ -76,7 +83,7 @@ export class AlertService {
 
       // Regla 5: Sin actualización por más de 2 días
       const storyProgress = progressRecords.filter((p) => p.storyId === story.id);
-      if (storyProgress.length > 0 && !isTerminalStatus(story.status)) {
+      if (storyProgress.length > 0 && !isCompleted(story.id, story.status)) {
         const lastUpdate = storyProgress
           .map((p) => parseISO(p.timestamp))
           .sort((a, b) => b.getTime() - a.getTime())[0];

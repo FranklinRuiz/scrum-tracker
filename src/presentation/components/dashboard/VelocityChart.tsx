@@ -29,7 +29,7 @@ const CustomTooltip = ({ active, payload, label }: {
         <div key={entry.name} className="flex items-center gap-2 text-sm">
           <span className="h-2 w-2 rounded-sm" style={{ backgroundColor: entry.fill }} />
           <span className="text-gray-600 dark:text-gray-400">{entry.name}:</span>
-          <span className="font-semibold text-gray-900 dark:text-white">{entry.value} pts</span>
+          <span className="font-semibold text-gray-900 dark:text-white">{entry.value} HU</span>
         </div>
       ))}
     </div>
@@ -59,8 +59,8 @@ export const VelocityChart: React.FC<VelocityChartProps> = ({ data }) => {
             <YAxis tick={{ fontSize: 11 }} tickLine={false} axisLine={false} />
             <Tooltip content={<CustomTooltip />} />
             <Legend wrapperStyle={{ paddingTop: '16px', fontSize: '12px' }} />
-            <Bar dataKey="committed" name="Comprometidos" fill="#c7d2fe" radius={[4, 4, 0, 0]} />
-            <Bar dataKey="completed" name="Completados" fill="#6366f1" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="committed" name="Planificadas" fill="#c7d2fe" radius={[4, 4, 0, 0]} />
+            <Bar dataKey="completed" name="Compromiso cumplido" fill="#6366f1" radius={[4, 4, 0, 0]} />
           </BarChart>
         </ResponsiveContainer>
       )}

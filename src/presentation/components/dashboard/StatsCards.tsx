@@ -88,7 +88,7 @@ export const StatsCards: React.FC<StatsCardsProps> = ({
       <StatCard
         title="Velocidad del equipo"
         value={teamVelocity}
-        subtitle="pts promedio/sprint"
+        subtitle="HU con compromiso cumplido (sprint activo)"
         icon={<Zap className="h-5 w-5" />}
         color="green"
       />

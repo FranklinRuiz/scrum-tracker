@@ -33,6 +33,11 @@ export const DashboardPage: React.FC = () => {
   );
 
 
+  const commitmentMetIds = useMemo(
+    () => new Set(progressRecords.filter((p) => p.commitmentMet).map((p) => p.storyId)),
+    [progressRecords]
+  );
+
   const blockedCount = useMemo(
     () => activeSprintStories.filter((s) => s.isBlocked).length,
     [activeSprintStories]
@@ -45,36 +50,33 @@ export const DashboardPage: React.FC = () => {
     const end = new Date(activeSprint.endDate);
     const totalDays = Math.max(1, (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
     const elapsed = Math.min(totalDays, Math.max(0, (today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
-    const expected = (elapsed / 8) * 100;
+    const expected = Math.min(100, (elapsed / 8) * 100);
     return activeSprintStories.filter(
-      (s) => !s.isBlocked && !isTerminalStatus(s.status) && s.progress < expected - 15
+      (s) =>
+        !s.isBlocked &&
+        !isTerminalStatus(s.status) &&
+        !commitmentMetIds.has(s.id) &&
+        s.progress < expected - 15
     ).length;
-  }, [activeSprintStories, activeSprint]);
+  }, [activeSprintStories, activeSprint, commitmentMetIds]);
 
-  // Velocity data
+  // Velocidad del equipo: HUs con compromiso cumplido en el sprint activo
+  const teamVelocity = useMemo(() => {
+    if (!activeSprint) return 0;
+    return activeSprintStories.filter((s) => commitmentMetIds.has(s.id)).length;
+  }, [activeSprint, activeSprintStories, commitmentMetIds]);
+
+  // Velocity chart — histórico por sprint (completados + activo)
   const velocityData: VelocityDataPoint[] = useMemo(() => {
     return sprints
       .filter((s) => s.status === 'completed' || s.status === 'active')
       .map((sprint) => {
         const sprintStories = stories.filter((s) => s.sprintId === sprint.id);
-        const completed = sprintStories
-          .filter((s) => isTerminalStatus(s.status))
-          .reduce((sum, s) => sum + s.points, 0);
-        return { sprint: sprint.name, committed: sprint.committedPoints, completed };
+        const committed = sprintStories.length;
+        const completed = sprintStories.filter((s) => commitmentMetIds.has(s.id)).length;
+        return { sprint: sprint.name, committed, completed };
       });
-  }, [sprints, stories]);
-
-  const teamVelocity = useMemo(() => {
-    const completedSprints = sprints.filter((s) => s.status === 'completed');
-    if (completedSprints.length === 0) return 0;
-    const total = completedSprints.reduce((sum, sprint) => {
-      const pts = stories
-        .filter((s) => s.sprintId === sprint.id && isTerminalStatus(s.status))
-        .reduce((acc, s) => acc + s.points, 0);
-      return sum + pts;
-    }, 0);
-    return Math.round(total / completedSprints.length);
-  }, [sprints, stories]);
+  }, [sprints, stories, commitmentMetIds]);
 
   // Burndown data
   const [burndownData, setBurndownData] = React.useState<BurndownDataPoint[]>([]);

@@ -195,6 +195,7 @@ export const StoriesPage: React.FC = () => {
     comment: string;
     newStatus: StoryStatus;
     commitmentMet: boolean;
+    date: string;
   }) => {
     try {
       await addProgress(data);
@@ -206,7 +207,7 @@ export const StoriesPage: React.FC = () => {
 
   const handleEditProgress = async (recordId: string, data: {
     storyId: string; developerId: string; hoursWorked: number;
-    comment: string; newStatus: StoryStatus; commitmentMet: boolean;
+    comment: string; newStatus: StoryStatus; commitmentMet: boolean; date: string;
   }) => {
     try {
       await editProgress({ recordId, ...data });

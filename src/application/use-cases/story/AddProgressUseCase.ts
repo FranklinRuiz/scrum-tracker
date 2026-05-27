@@ -13,6 +13,7 @@ export interface AddProgressInput {
   comment: string;
   newStatus: StoryStatus;
   commitmentMet?: boolean;
+  date?: string; // YYYY-MM-DD; defaults to today
 }
 
 export class AddProgressUseCase {
@@ -34,7 +35,7 @@ export class AddProgressUseCase {
       ? Math.round((totalHours / capacity) * 100)
       : 0;
 
-    const now = new Date().toISOString();
+    const now = input.date ? `${input.date}T12:00:00.000Z` : new Date().toISOString();
     const record: ProgressRecord = {
       id: uuidv4(),
       storyId: input.storyId,

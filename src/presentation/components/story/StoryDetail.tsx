@@ -29,6 +29,7 @@ interface StoryDetailSimpleProps {
     comment: string;
     newStatus: UserStory['status'];
     commitmentMet: boolean;
+    date: string;
   }) => Promise<void>;
   onEditProgress?: (recordId: string, data: {
     storyId: string;
@@ -37,6 +38,7 @@ interface StoryDetailSimpleProps {
     comment: string;
     newStatus: UserStory['status'];
     commitmentMet: boolean;
+    date: string;
   }) => Promise<void>;
   onDeleteProgress?: (recordId: string, storyId: string) => Promise<void>;
   onEdit: () => void;

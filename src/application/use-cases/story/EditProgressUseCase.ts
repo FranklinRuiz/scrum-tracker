@@ -13,6 +13,7 @@ export interface EditProgressInput {
   comment: string;
   newStatus: StoryStatus;
   commitmentMet?: boolean;
+  date?: string; // YYYY-MM-DD
 }
 
 function recalculate(
@@ -39,13 +40,15 @@ export class EditProgressUseCase {
     if (input.hoursWorked < 0) throw new Error('Hours worked must be non-negative');
 
     const allRecords = await this.progressRepository.getByStoryId(input.storyId);
+    const existing = allRecords.find((r) => r.id === input.recordId)!;
     const updatedRecord: ProgressRecord = {
-      ...allRecords.find((r) => r.id === input.recordId)!,
+      ...existing,
       developerId: input.developerId,
       hoursWorked: input.hoursWorked,
       comment: input.comment.trim(),
       newStatus: input.newStatus,
       commitmentMet: input.commitmentMet ?? false,
+      timestamp: input.date ? `${input.date}T12:00:00.000Z` : existing.timestamp,
     };
 
     const updatedAll = allRecords.map((r) => (r.id === input.recordId ? updatedRecord : r));
