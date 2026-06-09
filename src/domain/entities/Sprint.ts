@@ -12,10 +12,17 @@ export interface Sprint {
   updatedAt: string;
 }
 
-/** Cuenta los días hábiles (lunes–viernes) entre dos fechas ISO, inclusivo. */
+/**
+ * Cuenta los días hábiles (lunes–viernes) entre dos fechas ISO, excluyendo
+ * el primer y último día del sprint (reservados para ceremonias).
+ */
 export function getWorkingDays(startDate: string, endDate: string): number {
+  // Excluir primer y último día (planning y review/retro)
   const start = new Date(startDate + 'T12:00:00');
+  start.setDate(start.getDate() + 1);
   const end = new Date(endDate + 'T12:00:00');
+  end.setDate(end.getDate() - 1);
+
   let count = 0;
   const current = new Date(start);
   while (current <= end) {
