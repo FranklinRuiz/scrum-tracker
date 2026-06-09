@@ -2,7 +2,7 @@ import type { ISprintRepository } from '@/domain/repositories/ISprintRepository'
 import type { IUserStoryRepository } from '@/domain/repositories/IUserStoryRepository';
 import type { IProgressRepository } from '@/domain/repositories/IProgressRepository';
 import { differenceInDays, parseISO, format, eachDayOfInterval } from 'date-fns';
-import { EFFECTIVE_SPRINT_DAYS } from '@/domain/entities/Sprint';
+import { getWorkingDays } from '@/domain/entities/Sprint';
 
 export interface BurndownDataPoint {
   day: string;
@@ -56,6 +56,7 @@ export class GetSprintMetricsUseCase {
     const end = parseISO(sprint.endDate);
     const today = new Date();
     const daysTotal = differenceInDays(end, start);
+    const workingDaysTotal = Math.max(1, getWorkingDays(sprint.startDate, sprint.endDate));
     const daysElapsed = Math.min(
       Math.max(0, differenceInDays(today, start)),
       daysTotal
@@ -68,7 +69,7 @@ export class GetSprintMetricsUseCase {
       const effectiveDay = index;
       const idealRemaining = Math.max(
         0,
-        totalPoints - (totalPoints / EFFECTIVE_SPRINT_DAYS) * effectiveDay
+        totalPoints - (totalPoints / workingDaysTotal) * effectiveDay
       );
 
       // Una HU se considera lograda el día en que aparece el primer registro con commitmentMet = true
@@ -95,7 +96,7 @@ export class GetSprintMetricsUseCase {
     });
 
     const blockedCount = stories.filter((s) => s.isBlocked).length;
-    const expectedProgress = (daysElapsed / EFFECTIVE_SPRINT_DAYS) * 100;
+    const expectedProgress = (daysElapsed / workingDaysTotal) * 100;
     const atRiskCount = stories.filter(
       (s) =>
         !s.isBlocked &&

@@ -12,15 +12,28 @@ export interface Sprint {
   updatedAt: string;
 }
 
-/** Días base efectivos de un sprint de 2 semanas (10 laborables - primer y último día) */
-export const BASE_EFFECTIVE_DAYS = 8;
+/** Cuenta los días hábiles (lunes–viernes) entre dos fechas ISO, inclusivo. */
+export function getWorkingDays(startDate: string, endDate: string): number {
+  const start = new Date(startDate + 'T12:00:00');
+  const end = new Date(endDate + 'T12:00:00');
+  let count = 0;
+  const current = new Date(start);
+  while (current <= end) {
+    const dow = current.getDay();
+    if (dow !== 0 && dow !== 6) count++;
+    current.setDate(current.getDate() + 1);
+  }
+  return count;
+}
 
 /**
  * Calcula los días efectivos reales de un sprint descontando feriados.
+ * @param startDate - fecha inicio del sprint (ISO date)
+ * @param endDate - fecha fin del sprint (ISO date)
  * @param holidayCount - número de feriados dentro del sprint
  */
-export function getEffectiveDays(holidayCount: number): number {
-  return Math.max(0, BASE_EFFECTIVE_DAYS - holidayCount);
+export function getEffectiveDays(startDate: string, endDate: string, holidayCount: number): number {
+  return Math.max(0, getWorkingDays(startDate, endDate) - holidayCount);
 }
 
 /**
@@ -32,5 +45,7 @@ export function getDevCapacity(effectiveDays: number, daysOff: number): number {
   return Math.max(0, effectiveDays - daysOff);
 }
 
-/** @deprecated usar getEffectiveDays(0) — mantenido para compatibilidad */
+/** @deprecated usar getWorkingDays() con las fechas del sprint */
+export const BASE_EFFECTIVE_DAYS = 8;
+/** @deprecated usar getWorkingDays() con las fechas del sprint */
 export const EFFECTIVE_SPRINT_DAYS = BASE_EFFECTIVE_DAYS;

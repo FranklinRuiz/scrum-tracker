@@ -11,12 +11,13 @@ import { VelocityChart } from '../components/dashboard/VelocityChart';
 import { SprintProgress } from '../components/dashboard/SprintProgress';
 import { DeveloperMetrics } from '../components/dashboard/DeveloperMetrics';
 import { AlertsPanel } from '../components/dashboard/AlertsPanel';
+import { HoursPerDayChart } from '../components/dashboard/HoursPerDayChart';
 import { EmptyState } from '../components/common/EmptyState';
 import { LayoutDashboard } from 'lucide-react';
 import type { BurndownDataPoint } from '@/application/use-cases/sprint/GetSprintMetricsUseCase';
 import type { VelocityDataPoint } from '@/application/use-cases/dashboard/GetDashboardDataUseCase';
 import { isTerminalStatus } from '@/domain/value-objects/StoryStatus';
-import { getEffectiveDays, getDevCapacity } from '@/domain/entities/Sprint';
+import { getEffectiveDays, getDevCapacity, getWorkingDays } from '@/domain/entities/Sprint';
 
 export const DashboardPage: React.FC = () => {
   const { sprints, stories, progressRecords, developers, holidays, availability } = useAppStore();
@@ -50,7 +51,8 @@ export const DashboardPage: React.FC = () => {
     const end = new Date(activeSprint.endDate);
     const totalDays = Math.max(1, (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24));
     const elapsed = Math.min(totalDays, Math.max(0, (today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)));
-    const expected = Math.min(100, (elapsed / 8) * 100);
+    const workingDays = getWorkingDays(activeSprint.startDate, activeSprint.endDate);
+    const expected = Math.min(100, (elapsed / Math.max(1, workingDays)) * 100);
     return activeSprintStories.filter(
       (s) =>
         !s.isBlocked &&
@@ -95,12 +97,19 @@ export const DashboardPage: React.FC = () => {
     });
   }, [activeSprint, stories, progressRecords]);
 
+  // Progress records del sprint activo (para gráfico de horas por día)
+  const activeSprintProgressRecords = useMemo(() => {
+    if (!activeSprint) return [];
+    const storyIds = new Set(activeSprintStories.map((s) => s.id));
+    return progressRecords.filter((p) => storyIds.has(p.storyId));
+  }, [progressRecords, activeSprint, activeSprintStories]);
+
   // Developer metrics
   const developerMetrics = useMemo(() => {
     if (!activeSprint) return [];
     const sprintStoryIds = new Set(activeSprintStories.map((s) => s.id));
     const sprintHolidayCount = holidays.filter((h) => h.sprintId === activeSprint.id).length;
-    const effectiveDays = getEffectiveDays(sprintHolidayCount);
+    const effectiveDays = getEffectiveDays(activeSprint.startDate, activeSprint.endDate, sprintHolidayCount);
 
     return developers.map((dev) => {
       const devProgress = progressRecords.filter(
@@ -156,6 +165,14 @@ export const DashboardPage: React.FC = () => {
         <BurndownChart data={burndownData} />
         <VelocityChart data={velocityData} />
       </div>
+
+      {/* Hours per day time series */}
+      <HoursPerDayChart
+        progressRecords={activeSprintProgressRecords}
+        developers={developers}
+        sprintStartDate={activeSprint.startDate}
+        sprintEndDate={activeSprint.endDate}
+      />
 
       {/* Developer Metrics */}
       <DeveloperMetrics metrics={developerMetrics} />

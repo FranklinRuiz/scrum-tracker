@@ -2,7 +2,7 @@ import type { UserStory } from '@/domain/entities/UserStory';
 import type { Sprint } from '@/domain/entities/Sprint';
 import type { ProgressRecord } from '@/domain/entities/ProgressRecord';
 import { differenceInDays, parseISO } from 'date-fns';
-import { EFFECTIVE_SPRINT_DAYS } from '@/domain/entities/Sprint';
+import { getWorkingDays } from '@/domain/entities/Sprint';
 import { isTerminalStatus } from '@/domain/value-objects/StoryStatus';
 
 export type AlertSeverity = 'critical' | 'warning' | 'info';
@@ -26,7 +26,8 @@ export class AlertService {
     const now = new Date();
     const sprintStart = parseISO(sprint.startDate);
     const daysElapsed = Math.max(0, differenceInDays(now, sprintStart));
-    const expectedProgress = Math.min(100, (daysElapsed / EFFECTIVE_SPRINT_DAYS) * 100);
+    const workingDaysTotal = Math.max(1, getWorkingDays(sprint.startDate, sprint.endDate));
+    const expectedProgress = Math.min(100, (daysElapsed / workingDaysTotal) * 100);
 
     const commitmentMetIds = new Set(
       progressRecords.filter((p) => p.commitmentMet).map((p) => p.storyId)

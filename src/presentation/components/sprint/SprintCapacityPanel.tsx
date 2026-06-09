@@ -9,7 +9,7 @@ import type { Developer } from '@/domain/entities/Developer';
 import type { SprintHoliday } from '@/domain/entities/SprintHoliday';
 import type { DeveloperAvailability } from '@/domain/entities/DeveloperAvailability';
 import { ABSENCE_REASON_LABELS } from '@/domain/entities/DeveloperAvailability';
-import { BASE_EFFECTIVE_DAYS, getEffectiveDays, getDevCapacity } from '@/domain/entities/Sprint';
+import { getWorkingDays, getEffectiveDays, getDevCapacity } from '@/domain/entities/Sprint';
 import { Avatar } from '../common/Avatar';
 import { Button } from '../common/Button';
 import { Select } from '../common/Select';
@@ -62,7 +62,7 @@ export const SprintCapacityPanel: React.FC<SprintCapacityPanelProps> = ({
   const [expanded, setExpanded] = useState(true);
   const [confirmDialog, setConfirmDialog] = useState<{ message: string; onConfirm: () => Promise<void> } | null>(null);
 
-  const effectiveDays = getEffectiveDays(holidays.length);
+  const effectiveDays = getEffectiveDays(sprint.startDate, sprint.endDate, holidays.length);
   const activeDevelopers = developers.filter((d) => d.isActive);
 
   const getDevAvailability = (devId: string) =>
@@ -198,7 +198,7 @@ export const SprintCapacityPanel: React.FC<SprintCapacityPanelProps> = ({
           <div className="flex flex-wrap items-center gap-4 text-sm">
             <div className="flex items-center gap-1.5">
               <span className="text-gray-500 dark:text-gray-400">Días base:</span>
-              <span className="font-semibold text-gray-800 dark:text-gray-200">{BASE_EFFECTIVE_DAYS}</span>
+              <span className="font-semibold text-gray-800 dark:text-gray-200">{getWorkingDays(sprint.startDate, sprint.endDate)}</span>
             </div>
             <span className="text-gray-300 dark:text-gray-600">−</span>
             <div className="flex items-center gap-1.5">

@@ -7,6 +7,7 @@ import type { UserStory } from '@/domain/entities/UserStory';
 import type { ProgressRecord } from '@/domain/entities/ProgressRecord';
 import type { Developer } from '@/domain/entities/Developer';
 import { isTerminalStatus } from '@/domain/value-objects/StoryStatus';
+import { getWorkingDays } from '@/domain/entities/Sprint';
 
 export interface DeveloperMetric {
   developer: Developer;
@@ -107,7 +108,8 @@ export class GetDashboardDataUseCase {
         totalDays,
         Math.max(0, (today.getTime() - start.getTime()) / (1000 * 60 * 60 * 24))
       );
-      const expectedProgress = (elapsed / 8) * 100;
+      const workingDaysTotal = Math.max(1, getWorkingDays(sprint.startDate, sprint.endDate));
+      const expectedProgress = (elapsed / workingDaysTotal) * 100;
       return story.progress < expectedProgress - 15;
     }).length;
 
